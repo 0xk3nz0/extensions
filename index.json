@@ -520,9 +520,9 @@
       "fileName": "ArNovel",
       "imageURL": "https://github.com/shosetsuorg/extensions/raw/dev/icons/ArNovel.png",
       "lang": "ar",
-      "ver": "1.0.5",
+      "ver": "1.0.6",
       "libVer": "1.0.0",
-      "md5": "5557a78c434bae1c3ef2e09065da9cc79e6bd9844e3f1d4115df23293d1fdf50",
+      "md5": "87a4cc02773ac0155888e5f0407efca871472ebf47bf721454467462f7fc6eef",
       "type": "LuaScript"
     },
     {
