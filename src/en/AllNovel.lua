@@ -1,19 +1,21 @@
--- {"id":1,"ver":"3.0.1","libVer":"1.0.0","author":"Bigrand, TechnoJo4","dep":["novelvault>=1.0.0"]}
+-- {"id":273754,"ver":"1.0.0","libVer":"1.0.0","author":"Bigrand","dep":["novelvault>=1.0.0"]}
 
-return Require("novelvault")("https://novelfull.com", {
-	id = 1,
-	name = "NovelFull",
-	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NovelFull.png",
+return Require("novelvault")("https://allnovel.org", {
+	id = 273754,
+	name = "AllNovel",
+	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/AllNovel.png",
 
 	searchImgModFunc = function(imageURL)
-		return imageURL:gsub("00aa49a68cf30c9157b01d4feff36ff7", "2239c49aee6b961904acf173b7e4602a")
+		local url = imageURL:gsub("5c3c1127cd13ac4430ad26bdb61f11a3", "9c3d392ccc7c95187a8c6e37c6bdac6f")
+		:gsub("d0168a2c54d65b7e194fda5bb80ef28b","4d27e0af8cf6e971f7ee3c995fc55190")
+		return url
 	end,
 
 	listingConfigs = {
 		{ name = "Hot Novel", incrementing = true, param = "hot-novel" },
 		{ name = "Most Popular", incrementing = true, param = "most-popular" },
 		{ name = "Completed Novel", incrementing = true, param = "completed-novel" },
-		{ name = "Ongoing Novel", incrementing = true, param = "status/Ongoing" },
+		{ name = "Ongoing", incrementing = true, param = "status/Ongoing" },
 		{ name = "Latest Release", incrementing = true, param = "latest-release-novel" },
 	},
 
@@ -30,10 +32,8 @@ return Require("novelvault")("https://novelfull.com", {
 		"Adventure",
 		"Comedy",
 		"Drama",
-		"Eastern",
 		"Ecchi",
 		"Fantasy",
-		"Game",
 		"Gender Bender",
 		"Harem",
 		"Historical",
@@ -41,13 +41,12 @@ return Require("novelvault")("https://novelfull.com", {
 		"Horror",
 		"Josei",
 		"Lolicon",
-		"Magical Realism",
-		"Martial",
 		"Martial Arts",
 		"Mature",
 		"Mecha",
 		"Mystery",
 		"Psychological",
+		"Reincarnation",
 		"Romance",
 		"School Life",
 		"Sci-fi",
@@ -64,6 +63,5 @@ return Require("novelvault")("https://novelfull.com", {
 		"Xianxia",
 		"Xuanhuan",
 		"Yaoi",
-		"Yuri",
 	}
 })

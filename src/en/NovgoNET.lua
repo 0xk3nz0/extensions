@@ -1,13 +1,9 @@
--- {"id":1,"ver":"3.0.1","libVer":"1.0.0","author":"Bigrand, TechnoJo4","dep":["novelvault>=1.0.0"]}
+-- {"id":111359,"ver":"1.0.0","libVer":"1.0.0","author":"Bigrand","dep":["novelvault>=1.0.0"]}
 
-return Require("novelvault")("https://novelfull.com", {
-	id = 1,
-	name = "NovelFull",
-	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NovelFull.png",
-
-	searchImgModFunc = function(imageURL)
-		return imageURL:gsub("00aa49a68cf30c9157b01d4feff36ff7", "2239c49aee6b961904acf173b7e4602a")
-	end,
+return Require("novelvault")("https://novgo.net", {
+	id = 111359,
+	name = "Novgo (NET)",
+	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NovgoNET.png",
 
 	listingConfigs = {
 		{ name = "Hot Novel", incrementing = true, param = "hot-novel" },
@@ -22,7 +18,7 @@ return Require("novelvault")("https://novelfull.com", {
 	statuses = {
         { name = "Ongoing",   param = "status/Ongoing" },
         { name = "Completed", param = "completed-novel" },
-    },
+	},
 
 	genres = {
 		"Action",
@@ -36,30 +32,40 @@ return Require("novelvault")("https://novelfull.com", {
 		"Game",
 		"Gender Bender",
 		"Harem",
+		"Hentai",
 		"Historical",
-		"History",
 		"Horror",
+		"Isekai",
 		"Josei",
+		"LGBT+",
 		"Lolicon",
+		"Magic",
+		"Magical",
 		"Magical Realism",
+		"Manhua",
 		"Martial",
 		"Martial Arts",
 		"Mature",
 		"Mecha",
 		"Mystery",
 		"Psychological",
+		"Reincarnation",
 		"Romance",
 		"School Life",
 		"Sci-fi",
 		"Seinen",
 		"Shoujo",
+		"Shoujo AI",
 		"Shounen",
-		"Shounen Ai",
+		"Shounen AI",
 		"Slice of Life",
 		"Smut",
 		"Sports",
 		"Supernatural",
+		"System",
+		"Traged",
 		"Tragedy",
+		"Video Games",
 		"Wuxia",
 		"Xianxia",
 		"Xuanhuan",
