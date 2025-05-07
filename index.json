@@ -1,9 +1,16 @@
 {
   "authors": [
     {
+      "id": 1550377221,
+      "name": "Bigrand",
+      "desc": "Worked on All Novel Full, AllNovel, Free Web Novel, Light Novel Plus, NovLove (Boxnovel), NovelBin, NovelFull, NovelFull (NET), Novgo (NET), Read Novel Full, novelvault, unhtml",
+      "imageURL": "",
+      "website": ""
+    },
+    {
       "id": -2017179821,
       "name": "Doomsdayrs",
-      "desc": "Worked on Asian Hobbyist, Light Novel Bastion, Light Novel Heaven, MTLNovel, NeoSekai Translations, NovelFull, Novgo (Boxnovel), Rise Novel, Sky-mtl(novel-rare), Syosetsu, WuxiaWorld.Site, Zetro Translations",
+      "desc": "Worked on Asian Hobbyist, Light Novel Bastion, Light Novel Heaven, MTLNovel, NeoSekai Translations, NovLove (Boxnovel), Rise Novel, Sky-mtl(novel-rare), Syosetsu, WuxiaWorld.Site, Zetro Translations",
       "imageURL": "",
       "website": ""
     },
@@ -24,7 +31,7 @@
     {
       "id": -980691669,
       "name": "Confident-hate",
-      "desc": "Worked on Honeyfeed, KnoxT, NobleMTL, Novel Bin, NovelBuddy, Novelhall, PawRead, Read From Net, Wattpad",
+      "desc": "Worked on Honeyfeed, KnoxT, NobleMTL, NovelBin, NovelBuddy, Novelhall, PawRead, Read From Net, Wattpad",
       "imageURL": "",
       "website": ""
     },
@@ -81,13 +88,6 @@
       "id": 1440041231,
       "name": "Ali Mohamed",
       "desc": "Worked on Rewayat Club - نادي الروايات",
-      "imageURL": "",
-      "website": ""
-    },
-    {
-      "id": 1550377221,
-      "name": "Bigrand",
-      "desc": "Worked on unhtml",
       "imageURL": "",
       "website": ""
     },
@@ -154,12 +154,6 @@
       "hash": "ed160e1ab15729bd19f26fdff7acbcac27d2d7be7727441f059ff893db549357"
     },
     {
-      "name": "NovelFull",
-      "ver": "2.0.6",
-      "url": null,
-      "hash": "84f4fd7edfd462ff7bea853a139eb0312767de0e83fca4e68bbdb98a0b052b38"
-    },
-    {
       "name": "WWVolare",
       "ver": "1.2.2",
       "url": null,
@@ -176,6 +170,12 @@
       "ver": "1.0.1",
       "url": null,
       "hash": "97803cfe54b21695dda1e8f8a37c5933c4dc7691e5df17c2c1df6cef1203c259"
+    },
+    {
+      "name": "novelvault",
+      "ver": "1.0.0",
+      "url": null,
+      "hash": "1ddcaf0cc94750f7340416abf7a95687eceda066a48a3e1407ae58891532dcdb"
     },
     {
       "name": "unhtml",
@@ -201,22 +201,22 @@
       "id": 1,
       "name": "NovelFull",
       "fileName": "NovelFull",
-      "imageURL": "https://github.com/shosetsuorg/extensions/raw/dev/icons/NovelFull.png",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NovelFull.png",
       "lang": "en",
-      "ver": "2.0.1",
+      "ver": "3.0.1",
       "libVer": "1.0.0",
-      "md5": "33a30d7681b2b60ea7c572b283fdc311975b934b1733f885fbcd929a3fed64b2",
+      "md5": "0824623afe563f653c945330d89ec706ac170a98a0793965d7a4ee9ed1890aec",
       "type": "LuaScript"
     },
     {
       "id": 2,
-      "name": "Novgo (Boxnovel)",
-      "fileName": "BoxNovel",
-      "imageURL": "https://github.com/shosetsuorg/extensions/raw/dev/icons/BoxNovel.png",
+      "name": "NovLove (Boxnovel)",
+      "fileName": "NovLove",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NovLove.png",
       "lang": "en",
-      "ver": "3.2.0",
+      "ver": "4.2.0",
       "libVer": "1.0.0",
-      "md5": "2e364bcc9f0d2c7eac37f6bf02bb068d96ff05d9b96c9aaacaead37aa69ba764",
+      "md5": "af7965fb9144c994462ac8b8cb483524e378356a330da2b9304b18aa4113ba5a",
       "type": "LuaScript"
     },
     {
@@ -606,13 +606,13 @@
     },
     {
       "id": 95564,
-      "name": "Novel Bin",
-      "fileName": "Novelusb",
-      "imageURL": "https://i.imgur.com/hq3eeIM.png",
+      "name": "NovelBin",
+      "fileName": "NovelBin",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NovelBin.png",
       "lang": "en",
-      "ver": "1.0.10",
+      "ver": "2.0.10",
       "libVer": "1.0.0",
-      "md5": "9cc6b88c1791db2606a4c624fe66acb71280f69d16b1ef3accc1fc2ff4cab207",
+      "md5": "3ee2ae4cab4e1fbafd22979a652a1dc8605ec1fd08d8cb3514a0444c1c3658f2",
       "type": "LuaScript"
     },
     {
@@ -704,6 +704,28 @@
       "type": "LuaScript"
     },
     {
+      "id": 111359,
+      "name": "Novgo (NET)",
+      "fileName": "NovgoNET",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NovgoNET.png",
+      "lang": "en",
+      "ver": "1.0.0",
+      "libVer": "1.0.0",
+      "md5": "7c335fd00d6c942ef0a6c2b620bd46df46650efc0b3e90bb57f46e49e228409d",
+      "type": "LuaScript"
+    },
+    {
+      "id": 171264,
+      "name": "Read Novel Full",
+      "fileName": "ReadNovelFull",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/ReadNovelFull.png",
+      "lang": "en",
+      "ver": "1.0.0",
+      "libVer": "1.0.0",
+      "md5": "48178ffc14d465e7c4644b7a77bb8e3914ef8b740a1e1c4fe2297a0d661f179e",
+      "type": "LuaScript"
+    },
+    {
       "id": 172002,
       "name": "BL Novels",
       "fileName": "BLNovels",
@@ -748,6 +770,17 @@
       "type": "LuaScript"
     },
     {
+      "id": 174133,
+      "name": "Light Novel Plus",
+      "fileName": "LightNovelPlus",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/LightNovelPlus.png",
+      "lang": "en",
+      "ver": "1.0.0",
+      "libVer": "1.0.0",
+      "md5": "c468e1f9c110964854798c4d5f29562fbe633669e49107b29f4e649ef29218a7",
+      "type": "LuaScript"
+    },
+    {
       "id": 227675,
       "name": "Central Novel",
       "fileName": "CentralNovel",
@@ -759,6 +792,17 @@
       "type": "LuaScript"
     },
     {
+      "id": 233218,
+      "name": "All Novel Full",
+      "fileName": "AllNovelFull",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/AllNovelFull.png",
+      "lang": "en",
+      "ver": "1.0.0",
+      "libVer": "1.0.0",
+      "md5": "a2369c4995647be8c948c71cdccdc904be12c95aed0827aba2e6a736f6bd8851",
+      "type": "LuaScript"
+    },
+    {
       "id": 250401,
       "name": "Novel Mania",
       "fileName": "NovelMania",
@@ -767,6 +811,28 @@
       "ver": "1.0.0",
       "libVer": "1.0.0",
       "md5": "929112ddb8e8585cdced411a1592767de0effa5ed7d6ad00a24ebcabedee5518",
+      "type": "LuaScript"
+    },
+    {
+      "id": 273754,
+      "name": "AllNovel",
+      "fileName": "AllNovel",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/AllNovel.png",
+      "lang": "en",
+      "ver": "1.0.0",
+      "libVer": "1.0.0",
+      "md5": "9fb0e23f8e3b21086037acb22a89aa8ebaf87d2949dca38887575f8376ffddb4",
+      "type": "LuaScript"
+    },
+    {
+      "id": 325107,
+      "name": "Free Web Novel",
+      "fileName": "FreeWebNovel",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/FreeWebNovel.png",
+      "lang": "en",
+      "ver": "1.0.0",
+      "libVer": "1.0.0",
+      "md5": "91b2fcc5c1b37ec61330f5a57b5160a0ddd8d5284126b1bab2da121263f0b6d8",
       "type": "LuaScript"
     },
     {
@@ -789,6 +855,17 @@
       "ver": "1.1.0",
       "libVer": "1.0.0",
       "md5": "3a8e17bac58441743917b846322baf298243a5e491ad44c6cd9b96d3e37ce1bb",
+      "type": "LuaScript"
+    },
+    {
+      "id": 951840,
+      "name": "NovelFull (NET)",
+      "fileName": "NovelFullNET",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NovelFullNET.png",
+      "lang": "en",
+      "ver": "1.0.0",
+      "libVer": "1.0.0",
+      "md5": "f8b0be9a03884d2305b8bc12e27002c84b3f8e361b9664b1e265a684a01f7abd",
       "type": "LuaScript"
     },
     {
