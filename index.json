@@ -3,7 +3,7 @@
     {
       "id": 1550377221,
       "name": "Bigrand",
-      "desc": "Worked on All Novel Full, AllNovel, Free Web Novel, Light Novel Plus, NovLove (Boxnovel), NovelBin, NovelFull, NovelFull (NET), Novgo (NET), Read Novel Full, novelvault, unhtml",
+      "desc": "Worked on All Novel Full, AllNovel, Free Web Novel, Light Novel Plus, NOVA, NovLove (Boxnovel), NovelBin, NovelFull, NovelFull (NET), Novgo (NET), Read Novel Full, novelvault, unhtml",
       "imageURL": "",
       "website": ""
     },
@@ -872,11 +872,11 @@
       "id": 28505740,
       "name": "NOVA",
       "fileName": "NOVA",
-      "imageURL": "https://github.com/shosetsuorg/extensions/raw/dev/icons/NOVA.png",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NOVA.png",
       "lang": "es",
-      "ver": "1.1.4",
+      "ver": "1.2.4",
       "libVer": "1.0.0",
-      "md5": "d31e1884d3a20d94d953d708921455b723f91a1b0dbf10ecf21ee749ff5454d0",
+      "md5": "1b619db152ea8433fe3043630ea61942bc0f907f6c7405a9a5b4669eb425df4d",
       "type": "LuaScript"
     },
     {
