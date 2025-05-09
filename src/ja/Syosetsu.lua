@@ -1,4 +1,4 @@
--- {"id":3,"ver":"2.2.5","libVer":"1.0.0","author":"Doomsdayrs","dep":["url>=1.0.0"]}
+-- {"id":3,"ver":"2.2.5","libVer":"1.0.0","author":"Bigrand, Doomsdayrs","dep":["url>=1.0.0"]}
 
 local baseURL = "https://yomou.syosetu.com"
 local passageURL = "https://ncode.syosetu.com"
@@ -85,8 +85,8 @@ local function parseNovel(novelURL, loadChapters)
 	local description = ""
 	if descriptionElement then
 		description = tostring(descriptionElement):gsub("<br%s*/?>", "\n")
-		:gsub("<[^>]->", "")                     
-		:gsub("\n%s*\n+", "\n\n")       
+		:gsub("<[^>]->", "")
+		:gsub("\n%s*\n+", "\n\n")
 		:gsub("^%s+", "")
 		:gsub("%s+$", "")
 	end

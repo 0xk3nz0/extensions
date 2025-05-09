@@ -1,4 +1,4 @@
--- {"id":1,"ver":"3.0.1","libVer":"1.0.0","author":"Bigrand, TechnoJo4","dep":["novelvault>=1.0.0"]}
+-- {"id":1,"ver":"3.0.1","libVer":"1.0.0","author":"Bigrand, Doomsdayrs, TechnoJo4","dep":["novelvault>=1.0.0"]}
 
 return Require("novelvault")("https://novelfull.com", {
 	id = 1,
