@@ -3,14 +3,14 @@
     {
       "id": 1550377221,
       "name": "Bigrand",
-      "desc": "Worked on All Novel Full, AllNovel, Free Web Novel, Light Novel Plus, NOVA, NovLove (Boxnovel), NovelBin, NovelFull, NovelFull (NET), Novgo (NET), Read Novel Full, novelvault, unhtml",
+      "desc": "Worked on All Novel Full, AllNovel, Free Web Novel, Light Novel Plus, NOVA, NovLove (Boxnovel), NovelBin, NovelFull, NovelFull (NET), Novgo (NET), Read Novel Full, Syosetsu, novelvault, unhtml",
       "imageURL": "",
       "website": ""
     },
     {
       "id": -2017179821,
       "name": "Doomsdayrs",
-      "desc": "Worked on Asian Hobbyist, Light Novel Bastion, Light Novel Heaven, MTLNovel, NeoSekai Translations, NovLove (Boxnovel), Rise Novel, Sky-mtl(novel-rare), Syosetsu, WuxiaWorld.Site, Zetro Translations",
+      "desc": "Worked on Asian Hobbyist, Light Novel Bastion, Light Novel Heaven, MTLNovel, NeoSekai Translations, NovLove (Boxnovel), NovelFull, Rise Novel, Sky-mtl(novel-rare), Syosetsu, WuxiaWorld.Site, Zetro Translations",
       "imageURL": "",
       "website": ""
     },
@@ -78,13 +78,6 @@
       "website": ""
     },
     {
-      "id": 0,
-      "name": "",
-      "desc": "Worked on WTR-LAB",
-      "imageURL": "",
-      "website": ""
-    },
-    {
       "id": 1440041231,
       "name": "Ali Mohamed",
       "desc": "Worked on Rewayat Club - نادي الروايات",
@@ -130,6 +123,13 @@
       "id": -621820381,
       "name": "Xanvial",
       "desc": "Worked on Novel Nb",
+      "imageURL": "",
+      "website": ""
+    },
+    {
+      "id": -1612337247,
+      "name": "Zordic",
+      "desc": "Worked on WTR-LAB",
       "imageURL": "",
       "website": ""
     }
@@ -205,7 +205,7 @@
       "lang": "en",
       "ver": "3.0.1",
       "libVer": "1.0.0",
-      "md5": "0824623afe563f653c945330d89ec706ac170a98a0793965d7a4ee9ed1890aec",
+      "md5": "90c1b30ba119dd8dbd557e4fb55f941306a92df0d506669cb961643efa12ebf4",
       "type": "LuaScript"
     },
     {
@@ -227,7 +227,7 @@
       "lang": "ja",
       "ver": "2.2.5",
       "libVer": "1.0.0",
-      "md5": "e7abd21c4c1c9a6f44aed7353169038b45e7aee75c10e9390c79e1541487407b",
+      "md5": "b8e92ca759d7d553f99b4c61bc6531efc912d2ca57eb9b21f2e2bafb46c0e917",
       "type": "LuaScript"
     },
     {
@@ -700,7 +700,7 @@
       "lang": "en",
       "ver": "1.0.4",
       "libVer": "1.0.0",
-      "md5": "646622442ef8d29fd713f0ef0691680c6ceccddfee192440ba2a003dcb4e68e6",
+      "md5": "23f7281f2e245d33cf3c2fb974a453431788a3340e9c81b589686c4d625c06f9",
       "type": "LuaScript"
     },
     {
