@@ -1,4 +1,4 @@
--- {"ver":"1.0.0","author":"Bigrand","dep":["url>=1.0.0", "unhtml>=1.0.0"]}
+-- {"ver":"1.0.1","author":"Bigrand","dep":["url>=1.0.0", "unhtml>=1.0.0"]}
 
 local qs = Require("url").querystring
 local unhtml = Require("unhtml")
@@ -449,6 +449,11 @@ function defaults:searchPOST(query)
         :build()
 
     local results = RequestDocument(POST(self.baseURL .. "/" .. self.searchParam, HEADERS, body))
+
+    if selectWithFallback(results, self.listingTitleSelector, "listingTitle") then
+        error("[Info] No search results found for the given query.")
+    end
+
     return results
 end
 
@@ -560,6 +565,10 @@ function defaults:getPassage(chapterURL)
         node:remove()
     end
 
+    if chapter:hasAttr("style") then
+        chapter:removeAttr("style")
+    end
+
     -- Remove duplicated titles
     -- The CSS selector (and others) could be simplified by using a simple `:is()`, 
     -- but for some reason, I can't get it working :DDDDD
@@ -571,7 +580,7 @@ function defaults:getPassage(chapterURL)
 
     local selector = table.concat(selectorParts, ", ")
     local dupEl = document:selectFirst(selector)
-    local titleLower = title:lower()
+    local titleLower = trim(title):gsub("^\239\187\191", ""):gsub("%c+", ""):lower()
     local prefixLen = math.min(#titleLower, 9)
     local titlePrefix = titleLower:sub(1, prefixLen)
 
