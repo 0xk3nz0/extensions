@@ -1,4 +1,4 @@
--- {"ver":"1.0.1","author":"Bigrand","dep":["url>=1.0.0", "unhtml>=1.0.0"]}
+-- {"ver":"1.0.2","author":"Bigrand","dep":["url>=1.0.0", "unhtml>=1.0.0"]}
 
 local qs = Require("url").querystring
 local unhtml = Require("unhtml")
@@ -137,6 +137,9 @@ local defaults = {
     listingTitleSelector = {
         function(el)
             local title = el:selectFirst(".novel-title, .truyen-title, .tit")
+            if not title then
+                error("No results found...")
+            end
             return title and title:text()
         end
     },
@@ -449,10 +452,6 @@ function defaults:searchPOST(query)
         :build()
 
     local results = RequestDocument(POST(self.baseURL .. "/" .. self.searchParam, HEADERS, body))
-
-    if selectWithFallback(results, self.listingTitleSelector, "listingTitle") then
-        error("[Info] No search results found for the given query.")
-    end
 
     return results
 end
