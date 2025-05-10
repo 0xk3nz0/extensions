@@ -1,10 +1,12 @@
--- {"id":911,"ver":"2.0.0","libVer":"1.0.0","author":"TechnoJo4","dep":["url>=1.0.0","dkjson>=1.0.0"]}
+-- {"id":911,"ver":"2.1.0","libVer":"1.0.0","author":"TechnoJo4","dep":["dkjson>=1.0.0","unhtml>=1.0.0","url>=1.0.0"]}
 
 local baseURL = "https://creativenovels.com"
 local ajaxURL = "https://creativenovels.com/wp-admin/admin-ajax.php"
 
 ---@type fun(table, string): string
 local qs = Require("url").querystring
+local HTMLToString = Require("unhtml").HTMLToString
+
 ---@type dkjson
 local json = Require("dkjson")
 
@@ -13,6 +15,14 @@ local function shrinkURL(url, key)
 		return url:gsub(baseURL .. "/novel/", "")
 	elseif key == KEY_CHAPTER_URL then
 		return url:gsub(baseURL .. "/", "")
+	end
+end
+
+local function expandURL(url, key)
+	if key == KEY_NOVEL_URL then
+		return baseURL .. "/novel/" .. url
+	elseif key == KEY_CHAPTER_URL then
+		return baseURL .. "/" .. url
 	end
 end
 
@@ -54,16 +64,37 @@ local statuses = {
 	["Hiatus"] = 2
 }
 
+local function getImageURL(img)
+	print(img)
+	local srcset = img:attr("data-srcset")
+	if srcset and srcset ~= "" then
+		local max_url, max_size = "", 0
+		for url, size in srcset:gmatch("(http.-) (%d+)w") do
+			local num = tonumber(size)
+			if num and num > max_size then
+				max_size = num
+				max_url = url
+			end
+		end
+		return max_url
+	end
+
+	return img:attr("data-src") ~= "" and img:attr("data-src")
+	    or img:attr("src") ~= "" and img:attr("src")
+	    or img:attr("data-cfsrc") ~= "" and img:attr("data-cfsrc")
+		or ""
+end
+
 ---@param url string
 ---@param lc boolean @Load Chapters
 local function parseNovel(url, lc)
 	local doc = GETDocument(baseURL.."/novel/"..url)
 	local info = NovelInfo()
 
-	info:setImageURL(doc:selectFirst("img.book_cover"):attr("src"))
-
 	local infobar = doc:selectFirst(".x-bar-content:has(.x-hide-sm.x-hide-xs) .x-bar-container:has(.read_library)")
 	info:setTitle(infobar:children():get(1):text())
+	info:setDescription(HTMLToString(doc:selectFirst(".novel_page_synopsis")))
+	info:setImageURL(getImageURL(doc:selectFirst("img.book_cover")))
 	info:setGenres({ infobar:selectFirst(".genre_novel"):text() })
 	info:setAuthors({ infobar:selectFirst(".x-text-headline + div a"):text() })
 	info:setStatus(NovelStatus(statuses[infobar:selectFirst(".novel_status"):text()] or 3))
@@ -111,21 +142,46 @@ local function parseNovel(url, lc)
 	return info
 end
 
+local function search(data)
+	local query = data[QUERY]
+	local page = data[PAGE]
+	local url = qs({s = query}, expandURL("", 2))
+
+	if page > 1 then
+		return {}
+	end
+
+	local document = GETDocument(url)
+
+	local results = document:select(".search_data_results a")
+	results = map(results, function (v)
+		local link = shrinkURL(v:attr("href"), 1)
+		local title = shrinkURL(v:attr("href"), 1):gsub("(%a)([%w_']*)", function(a,b) return a:upper()..b:lower() end):gsub("%-", " "):gsub("/$", "")
+		local imageURL = getImageURL(v:selectFirst(".cover_art img"))
+		if imageURL == "" then
+			imageURL = "https://img.creativenovels.com/images/uploads/2020/07/Fish_s.jpg"
+		end
+		return Novel {
+			title = title,
+			link = link,
+			imageURL = imageURL,
+		}
+	end)
+
+	return results
+end
+
 return {
 	id = 911,
 	name = "Creative Novels",
 	baseURL = baseURL,
-	imageURL = "https://github.com/shosetsuorg/extensions/raw/dev/icons/CreativeNovels.png",
+	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/CreativeNovels.png",
 	chapterType = ChapterType.HTML,
-	hasSearch = false,
+	hasSearch = true,
+	isSearchIncrementing = false,
+	search = search,
 	shrinkURL = shrinkURL,
-	expandURL = function(url, key)
-		if key == KEY_NOVEL_URL then
-			return baseURL .. "/novel/" .. url
-		elseif key == KEY_CHAPTER_URL then
-			return baseURL .. "/" .. url
-		end
-	end,
+	expandURL = expandURL,
 	listings = {
 		Listing("Popular", true, function(data)
 			local page = data[PAGE]

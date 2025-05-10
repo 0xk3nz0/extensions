@@ -421,11 +421,11 @@
       "id": 911,
       "name": "Creative Novels",
       "fileName": "CreativeNovels",
-      "imageURL": "https://github.com/shosetsuorg/extensions/raw/dev/icons/CreativeNovels.png",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/CreativeNovels.png",
       "lang": "en",
-      "ver": "2.0.0",
+      "ver": "2.1.0",
       "libVer": "1.0.0",
-      "md5": "767fbb8e4cfc91c6d3c71e0f42ef3f40088c6b75ea9707610e9b622acb3fb5f4",
+      "md5": "4516755b13d2acc0947989de66bd78a2abc51ef895ba9a8c6e37b5d23b011f85",
       "type": "LuaScript"
     },
     {
