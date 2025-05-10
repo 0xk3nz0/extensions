@@ -1,23 +1,14 @@
--- {"id":95562,"ver":"1.0.0","libVer":"1.0.0","author":"Confident-hate"}
+-- {"id":95562,"ver":"1.1.0","libVer":"1.0.0","author":"Confident-hate"}
 
 local baseURL = "https://readfrom.net"
+local encode = Require("url").encode
 
----@param v Element
-local text = function(v)
-    return v:text()
-end
-
-
----@param url string
----@param type int
 local function shrinkURL(url)
-    return url:gsub("https://readfrom.net", "")
+    return url:gsub("^https?://readfrom%.net/", ""):gsub("^/", "")
 end
 
----@param url string
----@param type int
 local function expandURL(url)
-    return baseURL .. url
+    return baseURL .. "/" .. url
 end
 
 local GENRE_FILTER = 2
@@ -117,6 +108,7 @@ local GENRE_VALUES = {
     "Novels",
     "Military Fiction"
 }
+
 local GENREPARAMS = {
     "/allbooks/",
     "/romance/",
@@ -214,65 +206,169 @@ local GENREPARAMS = {
     "/military-fiction/"
 }
 
-local searchFilters = {
-    DropdownFilter(GENRE_FILTER, "Genre", GENRE_VALUES)
-}
-
---- @param chapterURL string @url of the chapter
---- @return string @of chapter
-local function getPassage(chapterURL)
-    local htmlElement = GETDocument(chapterURL)
-    htmlElement = htmlElement:selectFirst("#textToRead")
-    htmlElement:select(".highslide"):remove()
-    htmlElement:select(".splitnewsnavigation2.ignore-select"):remove()
-    return pageOfElem(htmlElement, true)
+local function trim(s)
+    return s:match("^%s*(.-)%s*$")
 end
 
---- @param data table
-local function search(data)
-    local queryContent = data[QUERY]
-    local doc = GETDocument(baseURL .. "/build_in_search/?q=" .. queryContent)
-    doc:select("script"):remove()
-    return map(doc:select(".box_in article"), function(v)
-        return Novel {
-            title = v:selectFirst("h2 b"):text(),
-            imageURL = v:selectFirst("a"):attr("href"),
-            link = v:selectFirst("h2 a"):attr("href")
-        }
-    end)
+local function buildDescription(document)
+    local descEl = document:selectFirst("h2 + b")
+    if not descEl then
+        return ""
+    end
+
+    local description = "This book is " .. descEl:text()
+    local agg = document:selectFirst('span[itemprop="aggregateRating"]')
+
+    if not agg then
+        return description
+    end
+
+    local value = trim(agg:selectFirst('span[itemprop="ratingValue"]'):text())
+    local best  = trim(agg:selectFirst('span[itemprop="bestRating"]'):text())
+    local count = trim(agg:selectFirst('span[itemprop="ratingCount"]'):text())
+
+    return string.format(
+        "%s\n\nRating: %s out of %s (Based on %s votes)",
+        description, value, best, count
+    )
 end
 
---- @param novelURL string @URL of novel
---- @return NovelInfo
-local function parseNovel(novelURL)
-    local url = baseURL .. novelURL
+local function parseNovel(novelURL, loadChapters)
+    local url = expandURL(novelURL)
     local document = GETDocument(url)
-    document:select("script"):remove()
-    local firstChSelector = document:selectFirst(".splitnewsnavigation2.ignore-select .pages span")
-    local firstChModifiedHTML = '<a href="' .. url .. '">' .. firstChSelector:text() .. '</a>'
-    document:selectFirst(".splitnewsnavigation2.ignore-select .pages span"):prepend(firstChModifiedHTML)
-    return NovelInfo {
+
+    local description = buildDescription(document)
+    local infoEl = document:selectFirst('div > span[itemprop="author"]')
+    local author
+    local genres = {}
+    if infoEl then
+        local infoText = infoEl:text()
+        local parts = {}
+        for part in infoText:gmatch("[^/]+") do
+            table.insert(parts, trim(part))
+        end
+        for i = 2, #parts do
+            table.insert(genres, parts[i])
+        end
+        author = parts[1]
+    else
+        author = document:selectFirst('li:last-of-type span[itemprop="name"]'):text()
+    end
+
+    local NovelInfo = NovelInfo {
         title = document:selectFirst(".title"):text():gsub(", page 1" ,""),
         imageURL = document:selectFirst(".box_in center .highslide"):attr("href"),
-        chapters = AsList(
-                map(document:select(".splitnewsnavigation2.ignore-select .pages a"), function(v)
-                    return NovelChapter {
-                        order = v,
-                        title = v:selectFirst("a"):text(),
-                        link = v:selectFirst('a'):attr("href")
-                    }
-                end)
-        )
+        description = description,
+        status = NovelStatus.COMPLETED, -- Each entry is a completed book, not a series.
+        genres = genres,
+        authors = { author },
     }
+
+    if loadChapters then
+        local chaptersEl = document:selectFirst(".splitnewsnavigation2.ignore-select .pages")
+        local firstChapter = chaptersEl:selectFirst("span")
+        local firstChapterHTML = '<a href="' .. url .. '">' .. firstChapter:text() .. '</a>'
+        chaptersEl:prepend(firstChapterHTML)
+
+        local i = 0
+        local chapters = AsList(map(chaptersEl:select("a"), function(v)
+            i = i + 1
+            return NovelChapter {
+                order = i,
+                title = string.format("‹‹ %s ››", v:selectFirst("a"):text()),
+                link = shrinkURL(v:selectFirst('a'):attr("href"))
+            }
+        end))
+
+        NovelInfo:setChapters(chapters)
+    end
+
+    return NovelInfo
+end
+
+local function getPassage(chapterURL)
+    local url = expandURL(shrinkURL(chapterURL))
+    local doc = GETDocument(url)
+    local chapter = doc:selectFirst("#textToRead")
+
+    chapter:select("iframe"):remove()
+    chapter:select("script"):remove()
+    chapter:select("style"):remove()
+    chapter:select("noscript"):remove()
+    chapter:select("svg"):remove()
+    chapter:select(".highslide"):remove()
+    chapter:select(".splitnewsnavigation, .splitnewsnavigation2"):remove()
+    chapter:select("center"):remove()
+
+    if chapter:hasAttr("style") then
+        chapter:removeAttr("style")
+    end
+
+    -- Trim leading and trailing whitespace
+    local nbsp = string.char(0xC2, 0xA0)
+    local function isRemovable(node)
+        local name = node:nodeName()
+        if name == "br" or name == "#comment" then
+            return true
+        elseif name == "#text" then
+            local txt = node:getWholeText():gsub(nbsp, " ")
+            -- If it's just whitespace, remove it.
+            -- Otherwise, it has text, so break the loop.
+            return txt:match("^%s*$") ~= nil
+        end
+        return false
+    end
+
+    -- Leading
+    while chapter:childNodeSize() > 0 do
+        local first = chapter:childNode(0) -- Jsoup (Java) is 0-index based 
+        if isRemovable(first) then
+            first:remove()
+        else
+            break
+        end
+    end
+
+    -- Trailing
+    while chapter:childNodeSize() > 0 do
+        local lastIndex = chapter:childNodeSize() - 1
+        local last      = chapter:childNode(lastIndex)
+        if isRemovable(last) then
+            last:remove()
+        else
+            break
+        end
+    end
+
+    return pageOfElem(chapter, true)
 end
 
 local function parseListing(listingURL)
-    local document = GETDocument(listingURL)
+    local url = listingURL -- Already expanded
+    local document = GETDocument(url)
+
     return map(document:select("#dle-content article.box.story.shortstory"), function(v)
         return Novel {
             title = v:selectFirst(".title a b"):text(),
             link = shrinkURL(v:selectFirst(".title a"):attr("href")),
             imageURL = v:selectFirst(".text img"):attr("src")
+        }
+    end)
+end
+
+local function search(data)
+    local page = data[PAGE]
+    if page > 1 then
+        return {}
+    end
+
+    local queryContent = encode(data[QUERY])
+    local doc = GETDocument(baseURL .. "/build_in_search/?q=" .. queryContent)
+    return map(doc:select(".box_in article"), function(v)
+        return Novel {
+            title = v:selectFirst("h2 b"):text(),
+            imageURL = v:selectFirst("a"):attr("href"),
+            link = shrinkURL(v:selectFirst("h2 a"):attr("href"))
         }
     end)
 end
@@ -297,7 +393,7 @@ return {
     id = 95562,
     name = "Read From Net",
     baseURL = baseURL,
-    imageURL = "https://static.readfrom.net//templates/gray_search/images/logo41.png",
+    imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/ReadFromNet.png",
     hasSearch = true,
     listings = {
         Listing("Default", true, getListing)
@@ -305,8 +401,11 @@ return {
     parseNovel = parseNovel,
     getPassage = getPassage,
     chapterType = ChapterType.HTML,
+    isSearchIncrementing = false,
     search = search,
     shrinkURL = shrinkURL,
     expandURL = expandURL,
-    searchFilters = searchFilters
+    searchFilters = {
+        DropdownFilter(GENRE_FILTER, "Genre", GENRE_VALUES)
+    }
 }
