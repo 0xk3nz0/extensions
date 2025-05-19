@@ -1,4 +1,4 @@
--- {"ver":"1.0.5","author":"JFronny","dep":["url>=1.0.0"]}
+-- {"ver":"1.0.6","author":"JFronny","dep":["url>=1.0.0"]}
 
 local qs = Require("url").querystring
 
@@ -83,10 +83,16 @@ function defaults:parseNovel(novelURL, loadChapters)
         -- this _does_ mean that we have to make an additional request for most novels, but it's the only way to get the avatar here
         img = GETDocument(self.baseURL .. "members/." .. username:get(0):attr("data-user-id") .. "?tooltip=true"):selectFirst(".memberTooltip-avatar img")
     end
+    local description = threadmarks:select(".threadmarkListingHeader-extraInfo .bbWrapper")
+    if description == nil then
+        description = head:selectFirst("meta[name='description']"):attr("content")
+    else
+        description = description:text()
+    end
     local novel = NovelInfo {
         title = head:selectFirst("meta[property='og:title']"):attr("content"),
         imageURL = extractImage(self.baseURL, img),
-        description = head:selectFirst("meta[name='description']"):attr("content"),
+        description = description,
         authors = map(username, text),
         status = s
     }
