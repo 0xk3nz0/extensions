@@ -1,4 +1,4 @@
--- {"id":573,"ver":"2.1.0","libVer":"1.0.0","author":"Doomsdayrs","dep":["url>=1.0.0"]}
+-- {"id":573,"ver":"2.1.1","libVer":"1.0.0","author":"Doomsdayrs","dep":["unhtml>=1.0.0","url>=1.0.0"]}
 
 local baseURL = "https://www.mtlnovels.com"
 
@@ -12,6 +12,7 @@ end
 
 ---@type fun(table, string): string
 local qs = Require("url").querystring
+local HTMLToString = Require("unhtml").HTMLToString
 
 ---@type dkjson
 local json = Require("dkjson")
@@ -33,7 +34,17 @@ local function getDetail(element)
 	return text(getDetailE(element))
 end
 
+local function fixImageURL(link)
+    return link
+	:gsub("(mtlnovel)%.net", "%1.pics")
+	:gsub("(%.%a+)%.webp", "%1")
+end
+
 local function search(data)
+	local page = data[PAGE]
+	if page ~= 0 then -- No pagination
+		return {}
+	end
 	local query = data[QUERY]
 	if query ~= nil then
 		query = ""
@@ -46,7 +57,7 @@ local function search(data)
 				return Novel {
 					link = shrinkURL(v:selectFirst("a"):attr("href")),
 					title = v:selectFirst(".list-title"):text(),
-					imageURL = v:selectFirst(".list-img"):attr("src")
+					imageURL = fixImageURL(v:selectFirst(".list-img"):attr("src"))
 				}
 			end)
 end
@@ -58,8 +69,11 @@ local function parseNovel(novelURL)
 	local document = GETDocument(url):selectFirst("article.post")
 	local n = NovelInfo()
 	n:setTitle(document:selectFirst("h1"):text())
-	n:setImageURL(document:selectFirst("amp-img.main-tmb"):selectFirst("amp-img.main-tmb"):attr("src"))
-	n:setDescription(table.concat(map(document:selectFirst("div.desc"):select("p"), text), "\n"))
+	n:setImageURL(fixImageURL(document:selectFirst("amp-img.main-tmb"):selectFirst("amp-img.main-tmb"):attr("src")))
+
+	document:select("p.descr"):remove()
+	local description = HTMLToString(document:select("div.desc p"))
+	n:setDescription(description)
 
 	local details = document:selectFirst("table.info"):select("tr")
 	local details2 = document:select("table.info"):get(1):select("tr")
@@ -111,7 +125,7 @@ end
 local function parseItem(item)
 	local a = Document(item.novel_permalink):selectFirst("a")
 	return Novel {
-		imageURL = item.tmb,
+		imageURL = fixImageURL(item.tmb),
 		link = shrinkURL(a:attr("href")),
 		title = a:text()
 	}
@@ -126,7 +140,7 @@ return {
 	id = 573,
 	name = "MTLNovel",
 	baseURL = baseURL,
-	imageURL = "https://github.com/shosetsuorg/extensions/raw/dev/icons/MTLNovel.png",
+	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/MTLNovel.png",
 	hasSearch = true,
 	chapterType = ChapterType.HTML,
 
@@ -137,6 +151,7 @@ return {
 	listings = {
 		Listing("Latest", true, getLatest)
 	},
+
 	getPassage = getPassage,
 	parseNovel = parseNovel,
 	search = search

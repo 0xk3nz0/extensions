@@ -344,11 +344,11 @@
       "id": 573,
       "name": "MTLNovel",
       "fileName": "MTLNovel",
-      "imageURL": "https://github.com/shosetsuorg/extensions/raw/dev/icons/MTLNovel.png",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/MTLNovel.png",
       "lang": "en",
-      "ver": "2.1.0",
+      "ver": "2.1.1",
       "libVer": "1.0.0",
-      "md5": "655066cf9a150cbbffe23d0dc56459bdac96499450856f4ac0aff3da701d783c",
+      "md5": "386aff84a04d6a7fdb87ea85f4e01398da62f735f7615f8ae6e7a5cbe2dc77b3",
       "type": "LuaScript"
     },
     {
