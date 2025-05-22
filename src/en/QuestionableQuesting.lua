@@ -1,9 +1,9 @@
--- {"id":1915581632,"ver":"1.1.0","libVer":"1.0.0","author":"JFronny","dep":["XenForo>=1.0.3"]}
+-- {"id":1915581632,"ver":"1.1.1","libVer":"1.0.0","author":"JFronny","dep":["XenForo>=1.0.3"]}
 
 return Require("XenForo")("https://forum.questionablequesting.com/", {
     id = 1915581632,
     name = "Questionable Questing",
-    imageURL = "https://forum.questionablequesting.com/styles/dark_responsive_green/xenforo/qq-blue-small.png",
+    imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/QuestionableQuesting.png",
     forums = {
         {
             title = "Creative Writing",

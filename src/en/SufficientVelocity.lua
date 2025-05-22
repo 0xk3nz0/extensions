@@ -1,9 +1,9 @@
--- {"id":1241865462,"ver":"1.1.1","libVer":"1.0.0","author":"JFronny","dep":["XenForo>=1.0.2"]}
+-- {"id":1241865462,"ver":"1.1.2","libVer":"1.0.0","author":"JFronny","dep":["XenForo>=1.0.2"]}
 
 return Require("XenForo")("https://forums.sufficientvelocity.com/", {
     id = 1241865462,
     name = "Sufficient Velocity",
-    imageURL = "https://forums.sufficientvelocity.com/data/svg/20/1/1723049117/logo_icon.png",
+    imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/SufficientVelocity.png",
     forums = {
         {
             title = "User Fiction",
