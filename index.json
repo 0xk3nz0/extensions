@@ -161,9 +161,9 @@
     },
     {
       "name": "XenForo",
-      "ver": "1.0.6",
+      "ver": "1.0.7",
       "url": null,
-      "hash": "5bf67e75478b69dca6c18ccefa70d67dab54fd79612979be07f7b551e91c12ce"
+      "hash": "37d040262fb2c17f42e94b0096700854e894724c06c8ea8bd771e3a9684f45c0"
     },
     {
       "name": "dkjson",
@@ -883,33 +883,33 @@
       "id": 1241865462,
       "name": "Sufficient Velocity",
       "fileName": "SufficientVelocity",
-      "imageURL": "https://forums.sufficientvelocity.com/data/svg/20/1/1723049117/logo_icon.png",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/SufficientVelocity.png",
       "lang": "en",
-      "ver": "1.1.1",
+      "ver": "1.1.2",
       "libVer": "1.0.0",
-      "md5": "e0da8bbda13b114f58479124db49e1de17631d3bcd5131ba1f9b4e2eec79f28e",
+      "md5": "18a138d49c266ba0535f31d145039b01428ba9026917a8f476e59e8868119345",
       "type": "LuaScript"
     },
     {
       "id": 1403038472,
       "name": "SpaceBattles",
       "fileName": "SpaceBattles",
-      "imageURL": "https://forums.spacebattles.com/data/svg/2/1/1722951957/2022_favicon_192x192.png",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/SpaceBattles.png",
       "lang": "en",
-      "ver": "1.1.0",
+      "ver": "1.1.1",
       "libVer": "1.0.0",
-      "md5": "66d2122cb16d63414d05c603adc44d7193cc1737c7fec9062ff5b4878f5f0208",
+      "md5": "6db85af25833fbd6f64b0d71460044eac34980bd5118857d734e4f5b985a49a6",
       "type": "LuaScript"
     },
     {
       "id": 1915581632,
       "name": "Questionable Questing",
       "fileName": "QuestionableQuesting",
-      "imageURL": "https://forum.questionablequesting.com/styles/dark_responsive_green/xenforo/qq-blue-small.png",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/QuestionableQuesting.png",
       "lang": "en",
-      "ver": "1.1.0",
+      "ver": "1.1.1",
       "libVer": "1.0.0",
-      "md5": "f5a6046d382310fe67ceb6a60f735e5418d5db211c8d85d1884eaf410bfb152a",
+      "md5": "d82a1b055e91bc68beabc89bb66496b89d414e106a5d95ebf9a122dd7c8de57e",
       "type": "LuaScript"
     }
   ],
