@@ -179,9 +179,9 @@
     },
     {
       "name": "unhtml",
-      "ver": "1.0.0",
+      "ver": "1.0.1",
       "url": null,
-      "hash": "31cedb54f46b1df35b5d7630d48185d58106336b0acb555ab66dce2e209d8176"
+      "hash": "3ecb2c80afb4903be3f6827284f3fc8914f43fe31894f94fb35d47f40c03b73f"
     },
     {
       "name": "url",
