@@ -92,13 +92,6 @@
       "website": ""
     },
     {
-      "id": 1877386402,
-      "name": "Gta-Cool",
-      "desc": "Worked on Light Novel Pub",
-      "imageURL": "",
-      "website": ""
-    },
-    {
       "id": 1816860847,
       "name": "Khonkhortisan",
       "desc": "Worked on NOVA",
@@ -228,17 +221,6 @@
       "ver": "2.2.5",
       "libVer": "1.0.0",
       "md5": "b8e92ca759d7d553f99b4c61bc6531efc912d2ca57eb9b21f2e2bafb46c0e917",
-      "type": "LuaScript"
-    },
-    {
-      "id": 31,
-      "name": "Light Novel Pub",
-      "fileName": "LightNovelPub",
-      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/LightNovelPub.png",
-      "lang": "en",
-      "ver": "1.0.1",
-      "libVer": "1.0.0",
-      "md5": "7324218bcab0e6fdc4596b0a8055f8c2f911f40dc994401aec79a66c01c96001",
       "type": "LuaScript"
     },
     {
