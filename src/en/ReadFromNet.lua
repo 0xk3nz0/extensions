@@ -1,4 +1,4 @@
--- {"id":95562,"ver":"1.1.0","libVer":"1.0.0","author":"Confident-hate"}
+-- {"id":95562,"ver":"1.1.1","libVer":"1.0.0","author":"Bigrand, Confident-hate"}
 
 local baseURL = "https://readfrom.net"
 local encode = Require("url").encode
@@ -291,14 +291,9 @@ local function getPassage(chapterURL)
     local doc = GETDocument(url)
     local chapter = doc:selectFirst("#textToRead")
 
-    chapter:select("iframe"):remove()
-    chapter:select("script"):remove()
-    chapter:select("style"):remove()
-    chapter:select("noscript"):remove()
-    chapter:select("svg"):remove()
-    chapter:select(".highslide"):remove()
-    chapter:select(".splitnewsnavigation, .splitnewsnavigation2"):remove()
-    chapter:select("center"):remove()
+    local uselessSelector = "iframe, script, style, noscript, svg, .highslide, .splitnewsnavigation, .splitnewsnavigation2, center"
+    local useless = chapter:select(uselessSelector)
+    if useless then useless:remove() end
 
     if chapter:hasAttr("style") then
         chapter:removeAttr("style")
@@ -338,6 +333,27 @@ local function getPassage(chapterURL)
         else
             break
         end
+    end
+
+    -- Taken from novelvault
+    -- Should be in a lib... eventually.
+    local textNodes = {}
+    local function collectTextNodes(node)
+        for i = 0, node:childNodeSize() - 1 do
+            local child = node:childNode(i)
+            if child:nodeName() == "#text" and not child:isBlank() then
+                table.insert(textNodes, trim(child:text()))
+            else
+                collectTextNodes(child)
+            end
+        end
+    end
+    collectTextNodes(chapter)
+
+    chapter:empty()
+    for _, paraText in ipairs(textNodes) do
+        local para = chapter:appendElement("p")
+        para:appendText(paraText)
     end
 
     return pageOfElem(chapter, true)

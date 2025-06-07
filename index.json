@@ -3,7 +3,7 @@
     {
       "id": 1550377221,
       "name": "Bigrand",
-      "desc": "Worked on All Novel Full, AllNovel, Free Web Novel, Light Novel Plus, NOVA, NovLove (Boxnovel), NovelBin, NovelFull, NovelFull (NET), Novgo (NET), Read Novel Full, Syosetsu, novelvault, unhtml",
+      "desc": "Worked on All Novel Full, AllNovel, Free Web Novel, Light Novel Plus, NOVA, NovLove (Boxnovel), NovelBin, NovelFull, NovelFull (NET), Novgo (NET), Read From Net, Read Novel Full, Syosetsu, novelvault, unhtml",
       "imageURL": "",
       "website": ""
     },
@@ -581,9 +581,9 @@
       "fileName": "ReadFromNet",
       "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/ReadFromNet.png",
       "lang": "en",
-      "ver": "1.1.0",
+      "ver": "1.1.1",
       "libVer": "1.0.0",
-      "md5": "a58019103ba2c27af58747ba680c16213af89216de7f018399edd2c32896a64e",
+      "md5": "d9d8b02a1a00938d7c6c2e4683defa8819de635e66b9a408dc747f93ede06b82",
       "type": "LuaScript"
     },
     {
