@@ -1,4 +1,4 @@
--- {"id":95566,"ver":"1.0.1","libVer":"1.0.0","author":"Confident-hate"}
+-- {"id":95566,"ver":"1.0.2","libVer":"1.0.0","author":"Confident-hate"}
 
 local baseURL = "https://novelbuddy.com"
 
@@ -163,6 +163,24 @@ local function getPassage(chapterURL)
     local chapter = htmlElement:selectFirst(".content-inner")
     local title = htmlElement:selectFirst("h1"):text()
     chapter:prepend("<h1>" .. title .. "</h1>")
+
+    -- stolen Code from novelvault, see comment line 550
+    local toRemove = {}
+    chapter:traverse(NodeVisitor(function(v)
+        local tag = v:tagName()
+        if tag == "br" then
+            local previous = v:previousElementSibling()
+            local next = v:nextElementSibling()
+
+            if previous and next and previous:tagName() == "p" and next:tagName() == "p" then
+                table.insert(toRemove, v)
+            end
+        end
+    end, function() end, true)) -- Enable elements only to avoid crashes
+
+    for _, node in ipairs(toRemove) do
+        node:remove()
+    end
 
     return pageOfElem(chapter, false)
 end
