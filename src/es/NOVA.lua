@@ -1,10 +1,25 @@
--- {"id":28505740,"ver":"1.2.4","libVer":"1.0.0","author":"Bigrand, Khonkhortisan","dep":["url>=1.0.0","CommonCSS>=1.0.0"]}
+-- {"id":28505740,"ver":"1.2.5","libVer":"1.0.0","author":"Bigrand, Khonkhortisan","dep":["CommonCSS>=1.0.0","unhtml>=1.0.0","url>=1.0.0"]}
 
 local baseURL = "https://novelasligeras.net" --WordPress site, plugins: WooCommerce, Yoast SEO, js_composer, user_verificat_front, avatar-privacy
 local HTMLToString = Require("unhtml").HTMLToString
+local qs = Require("url").querystring
+local css = Require("CommonCSS").table
+local urlLib = Require("url")
+local encode = urlLib.encode
+local decode = urlLib.decode
 
 -- LUA ARRAYS ONLY KNOW HOW TO COUNT FROM 0 or 1
-local ORDER_BY_FILTER_EXT = {"Ordenar por los últimos", "Orden alfabético", "Relevancia", "Ordenar por popularidad", "Ordenar por calificación media", "Ordenar por precio: bajo a alto", "Orden aleatorio"}
+local ORDER_BY_FILTER_EXT = {
+	"Ordenar por los últimos",
+	"Orden alfabético",
+	"Relevancia",
+	"Ordenar por popularidad",
+	"Ordenar por calificación media",
+	"Ordenar por precio: bajo a alto",
+	"Ordenar por precio: alto a bajo",
+	"Orden aleatorio"
+}
+
 local ORDER_BY_FILTER_INT = {
 	[0] = "date", --Ordenar por los últimos
 	"title"     , --Orden alfabético/Orden por defecto (Listing is title, webview search is title-DESC, selecting Orden por defecto is menu_order)
@@ -12,6 +27,7 @@ local ORDER_BY_FILTER_INT = {
 	"popularity", --Ordenar por popularidad
 	"rating"    , --Ordenar por calificación media
 	"price"     , --Ordenar por precio: bajo a alto
+	"price-desc", --Ordenar por precio: alto a bajo
 	"rand"      , --single-seed random order
 	--only some of these can be descending
 }
@@ -81,11 +97,32 @@ local settings = {
 --	[SUBSCRIBEBLOCK_SETTING_KEY] = false,
 }
 
-local qs = Require("url").querystring
-local css = Require("CommonCSS").table
-local urllib = Require("url")
-local encode = urllib.encode
-local decode = urllib.decode
+local function safeFetch(url)
+	local ok, document = pcall(GETDocument, url)
+
+	if not ok then
+		local errMsg = tostring(document)
+		local code = errMsg:match("(%d%d%d)")
+
+		if code == "429" then
+			error("Limite de llamadas alcanzado. Intentalo más tarde.")
+		elseif code == "403" then
+			error("CAPTCHA detectado. Usa WebView para completarlo."
+				.. "\nSi se queda en bucle, instala WebView Tester:"
+				.. "\nhttps://github.com/lsrom/webview-tester/releases/tag/2.2"
+				.. "\nColoca cualquier página y luego cambia el User Agent en opciones avanzadas con el de WebView Tester.")
+		else
+			error("HTTP error: " .. (code or errMsg))
+		end
+	end
+
+	local title = document:selectFirst("title"):text()
+	if title == "Just a moment..." then
+		error("CAPTCHA detectado. Usa WebView para completarlo.")
+	end
+
+	return document
+end
 
 local text = function(v)
 	return v:text()
@@ -170,10 +207,16 @@ local function createSearchString(data)
 	return expandURL("?s=" .. encode(data[QUERY]) .. "&post_type=product&" .. createFilterString(data))
 end
 
-local lastSeen = nil
+local totalPages = 1
 local function parseListing(listingURL, page)
-	local doc = GETDocument(listingURL)
+    if page > totalPages then return {} end
+
+	local doc = safeFetch(listingURL)
 	local results = doc:selectFirst(".dt-css-grid")
+
+    local lastPage = doc:select("div.woocommerce-pagination.paginator > a.page-numbers:not(.nav-next):not(.nav-prev):not(.act)")
+    lastPage = lastPage and lastPage:last()
+    totalPages = tonumber(lastPage and lastPage:text()) or 1
 
     -- Single‐result page (no listing = product page)
     if not results then
@@ -185,29 +228,12 @@ local function parseListing(listingURL, page)
         local link  = linkEl and shrinkURL(linkEl:attr("href"))
         local imageURL = getImageURL(imgEl)
 
-		if page then
-			if page > 1 and lastSeen == title then
-				return {}
-			end
-
-			lastSeen = title
-		end
-
 		if not title ~= "" then -- This could be a problem if the CSS changes in the future
 			return {}
 		end
 
         return { Novel { title = title, link = link, imageURL = imageURL } }
     end
-
-    local current = results:text()
-	if page then
-		if page > 1 and lastSeen == current then
-			return {}
-		end
-
-		lastSeen = current
-	end
 
 	if results then
 		return map(results:children(), function(v)
@@ -224,7 +250,7 @@ end
 
 local function parseNovel(novelURL, loadChapters)
 	local url = expandURL(novelURL, 1)
-	local doc = GETDocument(url)
+	local doc = safeFetch(url)
 
 	local page = doc:selectFirst(".content")
 	local header = page:selectFirst(".entry-summary")
@@ -247,8 +273,9 @@ local function parseNovel(novelURL, loadChapters)
 		artists = artists,
 		status = ({
 			Completado = NovelStatus.COMPLETED,
-			Pausado = NovelStatus.PAUSED,
 			["En Proceso"] = NovelStatus.PUBLISHING,
+			Pausado = NovelStatus.PAUSED,
+			Cancelado = NovelStatus.COMPLETED
 		})[status] or NovelStatus.UNKNOWN,
 		genres = map(genres:select("a"), text),
 		tags = map(tags:select("a"), text),
@@ -276,7 +303,7 @@ end
 
 local function getPassage(passageURL)
 	local url = expandURL(passageURL, 2)
-	local doc = GETDocument(url)
+	local doc = safeFetch(url)
 	local chapter = doc:selectFirst(".wpb_text_column .wpb_wrapper")
 
 	--leave any other possible <center> tags alone
@@ -293,6 +320,9 @@ local function getPassage(passageURL)
 	[[
 	img.wp-smiley, img.emoji {
 		height: 1em !important;
+	}
+	p:has(img) {
+		text-indent: 0em;
 	}
 	]]..css
 
@@ -319,14 +349,16 @@ return {
 	name = "NOVA",
 	baseURL = baseURL,
 	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NOVA.png",
+	hasCloudFlare = true,
 	hasSearch = true,
 	chapterType = ChapterType.HTML,
 	startIndex = 1,
 
 	listings = {
-		getListing("Lista de Novelas", true, "index.php/lista-de-novela-ligera-novela-web"),
+		getListing("Todas las Novelas", true, "index.php/lista-de-novela-ligera-novela-web"),
 		getListing("Novelas Exclusivas", true, "index.php/etiqueta-novela/novela-exclusiva"),
-		getListing("Novelas Completados", true, "index.php/filtro/estado/completado")
+		getListing("Novelas Completadas", true, "index.php/filtro/estado/completado"),
+		getListing("Novelas En Proceso", true, "index.php/filtro/estado/en-proceso")
 	},
 
 	shrinkURL = shrinkURL,

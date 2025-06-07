@@ -856,9 +856,9 @@
       "fileName": "NOVA",
       "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NOVA.png",
       "lang": "es",
-      "ver": "1.2.4",
+      "ver": "1.2.5",
       "libVer": "1.0.0",
-      "md5": "1b619db152ea8433fe3043630ea61942bc0f907f6c7405a9a5b4669eb425df4d",
+      "md5": "859ef5ce342383d0abe465f577b550ba763911b51628eaa0879fd95227150097",
       "type": "LuaScript"
     },
     {
