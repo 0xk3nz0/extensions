@@ -3,7 +3,7 @@
     {
       "id": 1550377221,
       "name": "Bigrand",
-      "desc": "Worked on All Novel Full, AllNovel, Free Web Novel, Light Novel Plus, NOVA, NovLove (Boxnovel), NovelBin, NovelFull, NovelFull (NET), Novgo (NET), Read From Net, Read Novel Full, Syosetsu, novelvault, unhtml",
+      "desc": "Worked on All Novel Full, AllNovel, Free Web Novel, Light Novel Plus, NOVA, NovLove (Boxnovel), NovelBin, NovelFull, NovelFull (NET), NovelHall, Novgo (NET), Read From Net, Read Novel Full, Syosetsu, novelvault, unhtml",
       "imageURL": "",
       "website": ""
     },
@@ -31,7 +31,7 @@
     {
       "id": -980691669,
       "name": "Confident-hate",
-      "desc": "Worked on Honeyfeed, KnoxT, NobleMTL, NovelBin, NovelBuddy, Novelhall, PawRead, Read From Net, Wattpad",
+      "desc": "Worked on Honeyfeed, KnoxT, NobleMTL, NovelBin, NovelBuddy, NovelHall, PawRead, Read From Net, Wattpad",
       "imageURL": "",
       "website": ""
     },
@@ -616,7 +616,7 @@
       "lang": "en",
       "ver": "1.0.2",
       "libVer": "1.0.0",
-      "md5": "02d5255a740e42014ec7d85ea3bdc41497546608dc8ea28c1baec8b721b54970",
+      "md5": "78b11d92b4f15bd936589a68bc40946d63480bbef538466d827c08c2db64e117",
       "type": "LuaScript"
     },
     {
@@ -632,13 +632,13 @@
     },
     {
       "id": 95570,
-      "name": "Novelhall",
-      "fileName": "Novelhall",
-      "imageURL": "https://www.novelhall.com/statics/default/images/logo.b5b4c.png",
+      "name": "NovelHall",
+      "fileName": "NovelHall",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NovelHall.png",
       "lang": "en",
-      "ver": "1.0.0",
+      "ver": "1.1.0",
       "libVer": "1.0.0",
-      "md5": "36cbe9052b761700ca88360f7716d44de201a80a182ba64b7d636b6513d99d94",
+      "md5": "bc738f83b1671684ac83d7af114b64d3a18b17fd41a134d06af4cd569203efef",
       "type": "LuaScript"
     },
     {
