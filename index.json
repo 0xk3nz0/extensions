@@ -31,7 +31,7 @@
     {
       "id": -980691669,
       "name": "Confident-hate",
-      "desc": "Worked on Honeyfeed, KnoxT, NobleMTL, NovelBin, NovelBuddy, NovelHall, PawRead, Read From Net, Wattpad",
+      "desc": "Worked on Honeyfeed, KnoxT, NovelBin, NovelBuddy, NovelHall, PawRead, Read From Net, Wattpad",
       "imageURL": "",
       "website": ""
     },
@@ -617,17 +617,6 @@
       "ver": "1.0.2",
       "libVer": "1.0.0",
       "md5": "78b11d92b4f15bd936589a68bc40946d63480bbef538466d827c08c2db64e117",
-      "type": "LuaScript"
-    },
-    {
-      "id": 95567,
-      "name": "NobleMTL",
-      "fileName": "NobleMTL",
-      "imageURL": "https://i1.wp.com/noblemtl.com/wp-content/uploads/2022/07/cropped-Noble-270x270.png",
-      "lang": "en",
-      "ver": "1.0.0",
-      "libVer": "1.0.0",
-      "md5": "9615fdda7ff30bb2cf23cc2df4a6e122b92e98ead38ccf6ec1184856d904cbe1",
       "type": "LuaScript"
     },
     {
