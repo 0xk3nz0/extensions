@@ -1,4 +1,4 @@
--- {"ver":"1.0.7","author":"JFronny","dep":["unhtml>=1.0.0","url>=1.0.0"]}
+-- {"ver":"1.0.8","author":"JFronny","dep":["unhtml>=1.0.0","url>=1.0.0"]}
 
 local HTMLToString = Require("unhtml").HTMLToString
 local qs = Require("url").querystring
@@ -61,6 +61,14 @@ local function extractImage(baseURL, element)
     return img
 end
 
+local function extractTitle(element)
+    map(element:select(".unreadLink"), function(v) v:remove() end)
+    map(element:select(".labelLink"), function(v) v:remove() end)
+    map(element:select(".label"), function(v) v:remove() end)
+    map(element:select(".label-append"), function(v) v:remove() end)
+    return element:text()
+end
+
 function defaults:parseNovel(novelURL, loadChapters)
     local threadmarks = GETDocument(self.expandURL(novelURL, KEY_NOVEL_URL) .. "/threadmarks?per_page=200")
     local head = threadmarks:selectFirst("head")
@@ -83,6 +91,12 @@ function defaults:parseNovel(novelURL, loadChapters)
         -- this _does_ mean that we have to make an additional request for most novels, but it's the only way to get the avatar here
         img = GETDocument(self.baseURL .. "members/." .. username:get(0):attr("data-user-id") .. "?tooltip=true"):selectFirst(".memberTooltip-avatar img")
     end
+    local title = threadmarks:select(".p-title-value")
+    if title == nil then
+        title = head:selectFirst("meta[property='og:title']"):attr("content")
+    else
+        title = extractTitle(title)
+    end
     local description = threadmarks:select(".threadmarkListingHeader-extraInfo .bbWrapper")
     if description == nil then
         description = head:selectFirst("meta[name='description']"):attr("content")
@@ -90,7 +104,7 @@ function defaults:parseNovel(novelURL, loadChapters)
         description = HTMLToString(description)
     end
     local novel = NovelInfo {
-        title = head:selectFirst("meta[property='og:title']"):attr("content"),
+        title = title,
         imageURL = extractImage(self.baseURL, img),
         description = description,
         authors = map(username, text),
@@ -192,7 +206,7 @@ function defaults:search(data)
     return map(page:select(".block-body .contentRow"), function(v)
         local a = v:selectFirst(".contentRow-title a")
         return Novel {
-            title = a:text(),
+            title = extractTitle(a),
             link = handleNovelURL(a:attr("href")),
             imageURL = extractImage(self.baseURL, v:selectFirst(".contentRow-figure img"))
         }
@@ -222,7 +236,7 @@ return function(baseURL, _self)
                 href = handleNovelURL(href)
                 if href:match(novelUrlBlacklist) then return nil end
                 return Novel {
-                    title = v:selectFirst(".structItem-title"):text(),
+                    title = extractTitle(v:selectFirst(".structItem-title")),
                     link = href,
                     imageURL = extractImage(baseURL, v:selectFirst(".structItem-cell--icon img"))
                 }
