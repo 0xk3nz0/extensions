@@ -1,4 +1,4 @@
--- {"id":102555,"ver":"1.0.4","libVer":"1.0.0","author":"Zordic"}
+-- {"id":102555,"ver":"1.0.5","libVer":"1.0.0","author":"Zordic"}
 
 local json = Require("dkjson")
 
@@ -11,7 +11,8 @@ local baseURL = "https://wtr-lab.com/"
 
 ---  Api URL of the ChapterData.
 local apiUrl =   "https://wtr-lab.com/api/reader/get"
-
+local Translation_url = "https://translate-pa.googleapis.com/v1/translateHtml"
+local autkey = "AIzaSyATBXajvzQLTDHEQbcpq0Ihe0vWDHmO520"
 
 --- URL of the logo.
 local imageURL = "https://i.imgur.com/ObQtFVW.png"
@@ -19,6 +20,7 @@ local imageURL = "https://i.imgur.com/ObQtFVW.png"
 
 --MediaType for JSON
 local mtype = MediaType("application/json; charset=utf-8")
+local mtype2 = MediaType("application/json+protobuf; charset=utf-8")
 
 
 --- Cloudflare protection status.
@@ -98,6 +100,7 @@ local function getPassage(chapterURL)
         chapter_id = content.chapter.id,
         language = "en",
         raw_id = content.chapter.raw_id,
+        translate = "web"
     }
     local body = RequestBody(json.encode(payload), mtype)
     local headers = HeadersBuilder():add("Content-Type", "application/json"):add("Referer", url):build()
@@ -105,7 +108,18 @@ local function getPassage(chapterURL)
     local responseBody = response:body():string()
     local jdata = json.decode(responseBody)
     local htmlContent = jdata.data.data.body
-    local html = table.concat(map(htmlContent, function(v) return "<p>" .. v .. "</p>" end))
+    local payload2 = {
+        {htmlContent, "zh-CN", "en" },
+        "wt_lib"
+    }
+    --every 2 eg: body2,headers2 and so on is only for translation qurey if you are usind google translate
+    local body2 = RequestBody(json.encode(payload2), mtype2)
+    local headers2 = HeadersBuilder():add("Content-Type", "application/json+protobuf"):add("Origin",baseURL):add("X-Goog-Api-Key", autkey):build()
+    local response2 = Request(POST(Translation_url, headers2, body2))
+    local responseBody2 = response2:body():string()
+    local jdata2 = json.decode(responseBody2)
+    local translatedContent = jdata2[1]
+    local html = table.concat(map(translatedContent, function(v) return "<p>" .. v .. "</p>" end))
     local doc = Document(html)
     -- Traverse the document to remove empty <p> tags
     local toRemove = {}
@@ -157,7 +171,7 @@ local function parseNovel(novelURL)
         for i, ch in ipairs(chapterData.chapters) do
             chapters[#chapters+1] = NovelChapter {
                 title = ch.title,
-                link = "serie-" .. serie.serie_data.raw_id .. "/" .. serie.serie_data.slug .. "/chapter-" .. ch.order .. "?service=google",
+                link = "serie-" .. serie.serie_data.raw_id .. "/" .. serie.serie_data.slug .. "/chapter-" .. ch.order .. "?service=web",
                 order = i
             }
         end
