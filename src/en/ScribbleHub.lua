@@ -1,9 +1,11 @@
--- {"id":86802,"ver":"1.0.5","libVer":"1.0.0","author":"TechnoJo4, StormX4","dep":["url>=1.0.0","CommonCSS>=1.0.0"]}
+-- {"id":86802,"ver":"1.0.6","libVer":"1.0.0","author":"TechnoJo4, StormX4","dep":["url>=1.0.0","CommonCSS>=1.0.0","unhtml>=1.0.0"]}
 
 local baseURL = "https://www.scribblehub.com"
 local qs = Require("url").querystring
 
 local css = Require("CommonCSS").table
+
+local HTMLToString = Require("unhtml").HTMLToString
 
 local function shrinkURL(url)
 	return url:gsub("^.-scribblehub%.com/?", "")
@@ -28,17 +30,93 @@ local MTYPE = MediaType("application/x-www-form-urlencoded; charset=UTF-8")
 local USERAGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:90.0) Gecko/20100101 Firefox/90.0"
 local HEADERS = HeadersBuilder():add("User-Agent", USERAGENT):build()
 
+---@param shortNum string
+---@return number
+local function expandNumber(shortNum)
+	local number, suffix = shortNum:match("^(%d+%.?%d*)([kKmMbB]?)$")
+
+	number = tonumber(number)
+	if not number then return nil end
+
+	if suffix == "k" or suffix == "K" then
+		return math.floor(number * 1e3 + 0.5)
+	elseif suffix == "m" or suffix == "M" then
+		return math.floor(number * 1e6 + 0.5)
+	elseif suffix == "b" or suffix == "B" then
+		return math.floor(number * 1e9 + 0.5)
+	else
+		return math.floor(number + 0.5)
+	end
+end
+
+---@param elements Elements
+---@param stat string
+---@return number | nil
+local function findStat(elements, stat)
+	local matchDesktop = " " .. stat .."$"
+	local matchMobile = "^" .. stat ..": "
+	for i = 0, elements:size() - 1 do
+		local part = elements:get(i):text()
+		if part:match(matchDesktop) ~= nil or part:match(matchMobile) ~= nil then
+			local number = part:gsub(matchDesktop, ""):gsub(matchMobile, ""):gsub(",", ""):gsub(" ", "")
+			return expandNumber(number)
+		end
+	end
+end
+
+local function removeElements(element, attr)
+	local elementToRemove = element:select(attr)
+	if elementToRemove then
+		elementToRemove:remove()
+	end
+end
+
 local function parse(doc)
 	return map(doc:selectFirst("#page"):select(".wi_fic_wrap .search_main_box"), function(v)
-		local body = v:selectFirst(".search_body .search_title a")
+		local body = v:selectFirst(".search_body")
 		if body == nil then
 			body = v
 		end
 		local t = v:selectFirst(".search_title a")
+		local stats = body:select(".search_stats .nl_stat")
+		local words = findStat(stats, "Words")
+		local views = findStat(stats, "Views")
+		local chapters = findStat(stats, "Chapters")
+		local comments = findStat(stats, "Reviews")
+		local favorites = findStat(stats, "Favorites")
+		local genres = map(v:select(".search_genre .fic_genre"), function(g)
+			return g:text()
+		end)
+		local author = v:selectFirst(".a_un_st"):text()
+		local description = body:ownText()
+		if description == nil or description:len() == 0 then
+			local element = body:selectFirst("> div:last-child")
+			if element then
+				removeElements(element, ".dots")
+				removeElements(element, ".morelink")
+				description = HTMLToString(element)
+			end
+		else
+			removeElements(body, ".dots")
+			removeElements(body, ".morelink")
+			removeElements(body, ".search_title")
+			removeElements(body, ".search_stats")
+			removeElements(body, ".search_genre")
+			description = HTMLToString(body)
+		end
+
 		return Novel {
 			title = t:text(),
 			link = t:attr("href"):match("/series/(%d+)"),
-			imageURL = v:selectFirst(".search_img img"):attr("src")
+			imageURL = v:selectFirst(".search_img img"):attr("src"),
+			wordCount = words,
+			viewCount = views,
+			chapterCount = chapters,
+			commentCount = comments,
+			favoriteCount = favorites,
+			genres = genres,
+			description = description,
+			authors = { author }
 		}
 	end)
 end
@@ -76,6 +154,8 @@ return {
 		local doc = GETDocument(baseURL.."/series/"..url.."/a/"):selectFirst(".site-content-contain")
 		local novel = doc:selectFirst("div[typeof=Book]")
 		local wrap = novel:selectFirst(".box_fictionpage")
+		removeElements(wrap, ".dots")
+		removeElements(wrap, ".morelink")
 		local s = doc:selectFirst(".copyright ul"):children()
 		
 		s = s:get(s:size() - 1):children()
@@ -95,10 +175,10 @@ return {
 		local info = NovelInfo {
 			title = novel:selectFirst(".fic_title"):text(),
 			imageURL = novel:selectFirst(".fic_image img"):attr("src"),
-			description = wrap:selectFirst(".wi_fic_desc"):text(),
+			description = HTMLToString(wrap:selectFirst(".wi_fic_desc")),
 			genres = map(wrap:selectFirst(".wi_fic_genre"):select("a"), text),
 			tags = map(wrap:selectFirst(".wi_fic_showtags"):select("a"), text),
-			authors = { novel:selectFirst("span[property=author] .auth_name_fic"):text() },
+			authors = { novel:selectFirst("span[property=name] .auth_name_fic"):text() },
 			status = s
 		}
 

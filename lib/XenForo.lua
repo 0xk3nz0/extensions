@@ -1,4 +1,4 @@
--- {"ver":"1.0.8","author":"JFronny","dep":["unhtml>=1.0.0","url>=1.0.0"]}
+-- {"ver":"1.0.9","author":"JFronny","dep":["unhtml>=1.0.0","url>=1.0.0"]}
 
 local HTMLToString = Require("unhtml").HTMLToString
 local qs = Require("url").querystring
@@ -103,12 +103,14 @@ function defaults:parseNovel(novelURL, loadChapters)
     else
         description = HTMLToString(description)
     end
+    local tags = map(threadmarks:select(".threadmarkListingHeader-tags a"), text)
     local novel = NovelInfo {
         title = title,
         imageURL = extractImage(self.baseURL, img),
         description = description,
         authors = map(username, text),
-        status = s
+        status = s,
+        tags = tags
     }
 
     if loadChapters then
@@ -151,6 +153,25 @@ local function handleNovelURL(url)
             :gsub("/unread$", "")
             :sub(10)
     return url
+end
+
+---@param shortNum string
+---@return number
+local function expandNumber(shortNum)
+    local number, suffix = shortNum:match("^(%d+%.?%d*)([kKmMbB]?)$")
+
+    number = tonumber(number)
+    if not number then return nil end
+
+    if suffix == "k" or suffix == "K" then
+        return math.floor(number * 1e3 + 0.5)
+    elseif suffix == "m" or suffix == "M" then
+        return math.floor(number * 1e6 + 0.5)
+    elseif suffix == "b" or suffix == "B" then
+        return math.floor(number * 1e9 + 0.5)
+    else
+        return math.floor(number + 0.5)
+    end
 end
 
 local CATEGORY_FILTER_KEY = 100
@@ -205,10 +226,24 @@ function defaults:search(data)
 
     return map(page:select(".block-body .contentRow"), function(v)
         local a = v:selectFirst(".contentRow-title a")
+        local wordCount = v:selectFirst("a[data-word_count]")
+        if wordCount then
+            wordCount = wordCount:attr("data-word_count")
+            if wordCount then
+                wordCount = tonumber(wordCount)
+            end
+        end
+        local author = v:selectFirst("a.username"):text()
+        local tags = map(v:select(".js-tagList a"), text)
         return Novel {
             title = extractTitle(a),
             link = handleNovelURL(a:attr("href")),
-            imageURL = extractImage(self.baseURL, v:selectFirst(".contentRow-figure img"))
+            imageURL = extractImage(self.baseURL, v:selectFirst(".contentRow-figure img")),
+            wordCount = wordCount,
+            authors = {
+                author
+            },
+            tags = tags
         }
     end)
 end
@@ -221,11 +256,11 @@ return function(baseURL, _self)
 
     _self["baseURL"] = baseURL
     local novelUrlBlacklist = _self["novelUrlBlacklist"] or "^$"
-    _self["listings"] = map(_self.forums, function(v)
-        return Listing(v.title, true, function(data)
+    _self["listings"] = map(_self.forums, function(l)
+        return Listing(l.title, true, function(data)
             --- @type int
             local page = data[PAGE]
-            local url = baseURL .. "forums/." .. v.forum .. "/page-" .. page .. "/"
+            local url = baseURL .. "forums/." .. l.forum .. "/page-" .. page .. "/"
             local doc = GETDocument(url)
 
             local pageCount = tonumber(doc:selectFirst(".pageNav-main .pageNav-page:last-of-type a"):text())
@@ -235,10 +270,27 @@ return function(baseURL, _self)
                 local href = v:selectFirst(".structItem-title a"):attr("href")
                 href = handleNovelURL(href)
                 if href:match(novelUrlBlacklist) then return nil end
+                local parts = v:select(".structItem-parts li")
+                local wordCount
+                for i = 0, parts:size() - 1 do
+                    local part = parts:get(i):text()
+                    if part:match("^Words: ") ~= nil then
+                        part = part:gsub("^Words: ", "")
+                        wordCount = expandNumber(part)
+                        break
+                    end
+                end
+                local author = v:selectFirst("a.username"):text()
+                local tags = map(v:select("a.tagItem"), text)
                 return Novel {
                     title = extractTitle(v:selectFirst(".structItem-title")),
                     link = href,
-                    imageURL = extractImage(baseURL, v:selectFirst(".structItem-cell--icon img"))
+                    imageURL = extractImage(baseURL, v:selectFirst(".structItem-cell--icon img")),
+                    wordCount = wordCount,
+                    authors = {
+                        author
+                    },
+                    tags = tags
                 }
             end)
         end)
