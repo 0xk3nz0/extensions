@@ -35,5 +35,5 @@ fi
 if [ "$DOWNLOAD_TESTER" = true ]; then
   ## Download extension tester
   mkdir -p bin
-  wget -O bin/extension-tester.jar "https://cdn.shosetsu.app/extension-tester/v2.0.0/extension-tester.jar"
+  wget -O bin/extension-tester.jar "https://gitlab.com/api/v4/projects/61884423/packages/maven/app/shosetsu/extension-tester/2.0.0+gitlab-maven-SNAPSHOT/extension-tester-2.0.0+gitlab-maven-20250914.064941-2-all.jar"
 fi
