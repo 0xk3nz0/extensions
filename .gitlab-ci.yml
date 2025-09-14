@@ -18,6 +18,7 @@ stages:
   - deploy
 
 before_script:
+  - apt update; apt install -y git
   - if [ -z "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" ]
   - then export FILES=($(git diff-tree --no-commit-id --name-only -r $CI_COMMIT_SHA | grep '^src/.*\.lua$'))
   - else git fetch origin $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
