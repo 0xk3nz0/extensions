@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/usr/bin/env bash
 set -euo pipefail
 
 # This file simply runs an http server locally and watches for changes in extensions to update the index.

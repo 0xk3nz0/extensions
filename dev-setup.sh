@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 ## Parse command line arguments
@@ -24,16 +24,26 @@ else
   done
 fi
 
+# Choose downloader
+if command -v curl >/dev/null 2>&1; then
+  download() { curl -L -o "$2" "$1"; }
+elif command -v wget >/dev/null 2>&1; then
+  download() { wget -O "$2" "$1"; }
+else
+  echo "Neither wget nor curl is installed. Please install one of them to proceed." >&2
+  exit 1
+fi
+
 if [ "$DOWNLOAD_DOC" = true ]; then
   ## Download lua documentation
-  wget -O _doc.lua https://gitlab.com/shosetsuorg/kotlin-lib/-/raw/main/_doc.lua
+  download "https://gitlab.com/shosetsuorg/kotlin-lib/-/raw/main/_doc.lua" "_doc.lua"
 
   ## Download javascript documentation
-  #wget -O doc.js https://gitlab.com/shosetsuorg/kotlin-lib/-/raw/main/doc.js
+  # download "https://gitlab.com/shosetsuorg/kotlin-lib/-/raw/main/doc.js" "doc.js"
 fi
 
 if [ "$DOWNLOAD_TESTER" = true ]; then
   ## Download extension tester
   mkdir -p bin
-  wget -O bin/extension-tester.jar "https://gitlab.com/api/v4/projects/61884423/packages/maven/app/shosetsu/extension-tester/2.0.0+gitlab-maven-SNAPSHOT/extension-tester-2.0.0+gitlab-maven-20250914.064941-2-all.jar"
+  download "https://gitlab.com/api/v4/projects/61884423/packages/maven/app/shosetsu/extension-tester/2.0.0+gitlab-maven-SNAPSHOT/extension-tester-2.0.0+gitlab-maven-20250914.064941-2-all.jar" "bin/extension-tester.jar"
 fi
