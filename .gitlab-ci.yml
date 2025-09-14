@@ -10,7 +10,7 @@
 # See https://docs.gitlab.com/ee/ci/yaml/index.html for all available options
 
 # you can delete this line if you're not using Docker
-image: eclipse-temurin:21
+image: eclipse-temurin:21-noble
 
 stages:
   - validate
