@@ -130,7 +130,7 @@ end
 
 -- Main extension export
 return {
-    id = 999999,
+    id = 1915581930,
     name = "Xiaowaz",
     baseURL = baseURL,
     imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/Xiaowaz.png",
