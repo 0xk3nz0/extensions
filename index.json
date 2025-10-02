@@ -125,6 +125,13 @@
       "desc": "Worked on WTR-LAB",
       "imageURL": "",
       "website": ""
+    },
+    {
+      "id": -306470064,
+      "name": "unTanya",
+      "desc": "Worked on Xiaowaz",
+      "imageURL": "",
+      "website": ""
     }
   ],
   "libraries": [
@@ -881,6 +888,17 @@
       "ver": "1.1.1",
       "libVer": "1.0.0",
       "md5": "d82a1b055e91bc68beabc89bb66496b89d414e106a5d95ebf9a122dd7c8de57e",
+      "type": "LuaScript"
+    },
+    {
+      "id": 1915581930,
+      "name": "Xiaowaz",
+      "fileName": "Xiaowaz",
+      "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/Xiaowaz.png",
+      "lang": "fr",
+      "ver": "1.0.2",
+      "libVer": "1.0.0",
+      "md5": "1ed2d8edab0be999339cb4832881aa60d0e9dcfb4f1ccd9b4a02c2d6a675182e",
       "type": "LuaScript"
     }
   ],
