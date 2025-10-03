@@ -1,22 +1,16 @@
 -- {"id":1915581930,"ver":"1.0.2","libVer":"1.0.0","author":"unTanya"}
 
+local baseURL = "https://xiaowaz.fr"
+
 ---@class Novel
 ---@field title string
 ---@field link string
 ---@field imageURL string
 local Novel = Novel
 
--- Base URL of the website
-local baseURL = "https://xiaowaz.fr"
-
---- Ensure an absolute URL (prefix baseURL when the input is relative like "?p=123" or "articles/...").
----@param url string
----@return string
 local function ensureAbsolute(url)
     if not url or url == "" then return url end
-    -- Already absolute (http/https)
     if url:match("^https?://") then return url end
-    -- Join with baseURL (handles both "?p=..." and "path/..." cases)
     if url:sub(1,1) == "/" then
         return baseURL .. url
     else
@@ -24,22 +18,19 @@ local function ensureAbsolute(url)
     end
 end
 
---- Get passage (chapter content) from a given chapter URL
----@param chapterURL string @Can be absolute or relative ("?p=..."/"articles/...")
----@return string @Cleaned HTML text
+--- Nettoie le contenu du chapitre
 local function getPassage(chapterURL)
-    -- Always fetch using an absolute URL to avoid "Expected URL scheme" errors
     local absURL = ensureAbsolute(chapterURL)
-    local doc = GETDocument(absURL):selectFirst("div.entry-content")
-    if doc == nil then
-        return "Chapter not found."
-    end
-    return pageOfElem(doc, true)
+    local doc = GETDocument(absURL)
+    local content = doc:selectFirst("div.entry-content")
+    if not content then return "Chapter not found." end
+    -- remove unwanted blocks
+    content:select("div.wp-post-navigation"):remove()
+    content:select("div.abh_box"):remove()
+    return pageOfElem(content, true)
 end
 
---- Listing latest chapters through the RSS feed with pagination
----@param data table @Shosetsu passes { [PAGE] = number }
----@return Novel[]
+--- Listing depuis le flux RSS mais redirige vers la page série
 local function latest(data)
     local page = data[PAGE] or 1
     local rssURL = baseURL .. "/index.php/feed/?paged=" .. page
@@ -47,88 +38,98 @@ local function latest(data)
     local results = {}
     local items = rss:select("item")
 
-    print("DEBUG: page=" .. page .. " -> found " .. items:size() .. " items in RSS")
+    print("DEBUG latest: page="..page.." found "..items:size().." items")
 
-    -- Si 0 item → fin immédiate
-    if items:size() == 0 then
-        return {}
-    end
+    if items:size() == 0 then return {} end
 
     for i = 0, items:size() - 1 do
         local item = items:get(i)
-        local titleElem = item:selectFirst("title")
-        local guidElem  = item:selectFirst("guid")
+        local title = item:selectFirst("title"):text()
+        local link  = item:selectFirst("guid"):text():gsub("%?utm_source.*","")
 
-        local title = titleElem and titleElem:text() or "Untitled"
-        local link  = guidElem and guidElem:text() or ""
-
-        if link ~= "" then
-            -- Nettoyage des UTM
-            link = link:gsub("%?utm_source.*", "")
-
-            -- Si relatif, normaliser
-            if link:match("^%?p=") then
-                link = baseURL .. "/articles/" .. link
+        -- aller chercher la page d’article
+        local artDoc = GETDocument(link)
+        local cat = artDoc:select("span.cat-links a")
+        local seriesLink, seriesName = nil, nil
+        for j=0,cat:size()-1 do
+            local a = cat:get(j)
+            local href = a:attr("href")
+            if href:find("/articles/category/series/") then
+                seriesLink = href
+                seriesName = a:text()
+                break
             end
+        end
 
-            -- Chercher la cover une seule fois par œuvre
+        if seriesLink then
+            print("DEBUG latest: novel="..seriesName.." seriesLink="..seriesLink)
+
             local cover = "@icon/Xiaowaz.png"
-            local coverImg = GETDocument(link):selectFirst("img.attachment-post-thumbnail")
-            if coverImg then
-                cover = coverImg:attr("src")
-            end
+            local coverImg = artDoc:selectFirst("img.attachment-post-thumbnail")
+            if coverImg then cover = coverImg:attr("src") end
 
             table.insert(results, Novel {
-                title = title,
-                link = link,
+                title = seriesName,
+                link = seriesLink,
                 imageURL = cover
             })
+        else
+            print("DEBUG latest: skipped article (no series) title="..title)
         end
-    end
-
-    -- Si on a trouvé moins de 10 items → fin de pagination
-    if items:size() < 10 then
-        print("DEBUG: page=" .. page .. " is the last page (found only " .. items:size() .. " items)")
-        return {}
     end
 
     return results
 end
 
-
-
-
-
---- Parse a "novel" page (actually a single article on Xiaowaz)
----@param novelURL string @Can be absolute or relative
----@return NovelInfo
+--- Parse la page série
 local function parseNovel(novelURL)
-    -- Always expand to absolute before fetching
     local url = ensureAbsolute(novelURL)
+    print("DEBUG parseNovel: url="..url)
+
     local doc = GETDocument(url)
-
     local titleElem = doc:selectFirst("h1.entry-title")
-    local title = titleElem and titleElem:text() or "Chapter"
+    local title = titleElem and titleElem:text() or "Unknown series"
 
-    -- Try to get a cover if present on the article page
-    -- (class often used: "attachment-post-thumbnail size-post-thumbnail wp-post-image")
-    local imgElem = doc:selectFirst("img.attachment-post-thumbnail")
-    local cover = (imgElem and imgElem:attr("src") and imgElem:attr("src") ~= "") and imgElem:attr("src") or "@icon/Xiaowaz.png"
+    local coverElem = doc:selectFirst("img.attachment-post-thumbnail")
+    local cover = "@icon/Xiaowaz.png"
+    if coverElem then
+        local src = coverElem:attr("src")
+        if src and src ~= "" then
+            cover = src
+        end
+    end
+    print("DEBUG parseNovel: cover="..cover)
+
+
+    local chapters = {}
+    local fairy = doc:selectFirst("div.fairy-content-area")
+    if fairy then
+        local articles = fairy:select("article")
+        print("DEBUG parseNovel: found "..articles:size().." articles")
+        for i=0, articles:size()-1 do
+            local h2 = articles:get(i):selectFirst("h2.card_title a")
+            if h2 then
+                local chapTitle = h2:text()
+                local chapLink  = h2:attr("href")
+                print("DEBUG parseNovel: chapter["..i.."] "..chapTitle.." -> "..chapLink)
+                table.insert(chapters, NovelChapter {
+                    title = chapTitle,
+                    link = chapLink
+                })
+            end
+        end
+    else
+        print("DEBUG parseNovel: no fairy-content-area")
+    end
 
     return NovelInfo {
         title = title,
         description = title,
         imageURL = cover,
-        chapters = AsList({
-            NovelChapter {
-                title = title,
-                link = novelURL, -- keep original; getPassage will ensureAbsolute() before fetching
-            }
-        })
+        chapters = AsList(chapters)
     }
 end
 
--- Main extension export
 return {
     id = 1915581930,
     name = "Xiaowaz",
@@ -143,28 +144,18 @@ return {
     getPassage = getPassage,
     chapterType = ChapterType.HTML,
 
-    -- Keep shrink/expand, but make them tolerant with absolute URLs.
-    shrinkURL = function(url, _)
-        if not url or url == "" then
-            return url
-        end
-        if url:sub(1, #baseURL) == baseURL then
-            return url:gsub(baseURL .. "/", "")
+    shrinkURL = function(url,_)
+        if not url or url == "" then return url end
+        if url:sub(1,#baseURL) == baseURL then
+            return url:gsub(baseURL.."/","")
         end
         return url
     end,
 
-    expandURL = function(url, _)
-        -- If it's already absolute, return as-is
-        if url and url:match("^https?://") then
-            return url
-        end
-        -- Otherwise, prefix baseURL safely
-        if url and url:sub(1, 1) == "/" then
-            return baseURL .. url
-        else
-            return baseURL .. "/" .. (url or "")
-        end
+    expandURL = function(url,_)
+        if url and url:match("^https?://") then return url end
+        if url and url:sub(1,1) == "/" then return baseURL..url end
+        return baseURL.."/"..(url or "")
     end,
 
     hasSearch = false,
