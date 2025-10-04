@@ -896,9 +896,9 @@
       "fileName": "Xiaowaz",
       "imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/Xiaowaz.png",
       "lang": "fr",
-      "ver": "1.0.2",
+      "ver": "1.1.0",
       "libVer": "1.0.0",
-      "md5": "63e5a1b94f7fda25f325a9a73153b9a199d3e08a762cff003eacda4a23a1600a",
+      "md5": "ba5605b4a441c3a2be38caa02a6be288b10eb68872f33a8562f8ca4a5e6754d4",
       "type": "LuaScript"
     }
   ],
