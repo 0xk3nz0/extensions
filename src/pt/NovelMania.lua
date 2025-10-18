@@ -1,4 +1,4 @@
--- {"id":250401,"ver":"2.0.0","libVer":"1.0.0","author":"Claudemirovsky","dep":["url>=1.0.0"]}
+-- {"id":250401,"ver":"2.0.1","libVer":"1.0.0","author":"Claudemirovsky","dep":["url>=1.0.0"]}
 
 local baseURL = "https://novelmania.com.br"
 local qs = Require("url").querystring
@@ -110,20 +110,26 @@ local function parseNovel(novelURL)
   local genreElems = doc:select("div.tags ul.list-tags a")
   local chapterElems = doc:select("ol.list-inline li a")
   
-  local chapters = AsList(
-    map(chapterElems, function(el)
-      local strong = el:selectFirst("strong")
-      local small = el:selectFirst("small")
-      return NovelChapter {
-        title = strong and strong:text() or el:text(),
-        link = shrinkURL(el:attr("href")),
-        release = small and small:text() or "",
-        order = #chapterElems
-      }
-    end)
-  )
+  local chaptersArray = {}
+  for i = 0, chapterElems:size() - 1 do
+    local el = chapterElems:get(i)
+    local strong = el:selectFirst("strong")
+    local small = el:selectFirst("small")
+    chaptersArray[#chaptersArray + 1] = NovelChapter {
+      title = strong and strong:text() or el:text(),
+      link = shrinkURL(el:attr("href")),
+      release = small and small:text() or "",
+      order = i + 1
+    }
+  end
   
-  local statusText = statusElem and statusElem:ownText() or "Desconhecido"
+  local chapters = AsList(chaptersArray)
+  
+  local function trim(s)
+    return s and s:match("^%s*(.-)%s*$") or ""
+  end
+  
+  local statusText = statusElem and trim(statusElem:ownText()) or "Desconhecido"
   local statusMap = {
     ["Ativo"] = NovelStatus.PUBLISHING,
     ["Completo"] = NovelStatus.COMPLETED,
@@ -140,11 +146,13 @@ local function parseNovel(novelURL)
     description = table.concat(parts, "\n")
   end
   
+  local authorText = authorElem and trim(authorElem:ownText()) or "Desconhecido"
+  
   return NovelInfo {
     title = title and title:text() or "",
     imageURL = img and img:attr("src") or "",
     description = description,
-    authors = { authorElem and authorElem:ownText() or "Desconhecido" },
+    authors = { authorText },
     genres = map(genreElems, function(el) return el:text() end),
     status = statusMap[statusText] or NovelStatus.UNKNOWN,
     chapters = chapters
