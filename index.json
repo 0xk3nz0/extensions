@@ -786,9 +786,9 @@
       "fileName": "NovelMania",
       "imageURL": "https://novelmania.com.br/assets/logo-blue-ccbd5d317242b0f0479edd2cad954fd235dbdfeb662bb338d987f8f57e3794a2.png",
       "lang": "pt",
-      "ver": "1.0.0",
+      "ver": "1.0.1",
       "libVer": "1.0.0",
-      "md5": "929112ddb8e8585cdced411a1592767de0effa5ed7d6ad00a24ebcabedee5518",
+      "md5": "bfbbbcee906eea84f00b699849f4c7738156522b1633791902d78e576f302838",
       "type": "LuaScript"
     },
     {

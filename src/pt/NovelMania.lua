@@ -1,4 +1,4 @@
--- {"id":250401,"ver":"1.0.0","libVer":"1.0.0","author":"Claudemirovsky","dep":["url>=1.0.0"]}
+-- {"id":250401,"ver":"1.0.1","libVer":"1.0.0","author":"Claudemirovsky","dep":["url>=1.0.0"]}
 
 -- ============================= CONSTANTS ==============================
 local id = 250401 -- from a good doujinshi by Ringoya/alp
@@ -181,7 +181,7 @@ end
 ---@param order string
 ---@return string
 local function createFilterUrl(filters, order)
-  local query = { ["page"] = filters[PAGE] }
+  local query = {}
   if filters[QUERY] then
     query["titulo"] = filters[QUERY]
   end
@@ -221,8 +221,15 @@ end
 ---@return Novel[]
 local function parseList(url)
   local document = GETDocument(url)
-  local selector = "div.top-novels div.col-sm-12 > a:not(.novel)"
-  return map(document:select(selector), parseNovelFromElement)
+  local selector = "div.top-novels a"
+  return map(document:select(selector), function(link)
+    local img = link:selectFirst("img")
+    return Novel {
+      title = img:attr("alt"):gsub("Capa de ", ""),
+      imageURL = img:attr("src"),
+      link = shrinkURL(link:attr("href"))
+    }
+  end)
 end
 
 ---@param listname string
@@ -244,7 +251,7 @@ return {
     listing("Recentes", "3")
   },
   hasSearch = true,
-  isSearchIncrementing = true,
+  isSearchIncrementing = false,
   search = function(data)
     return parseList(createFilterUrl(data, ""))
   end,
