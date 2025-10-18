@@ -1,14 +1,10 @@
--- {"id":250401,"ver":"1.0.1","libVer":"1.0.0","author":"Claudemirovsky","dep":["url>=1.0.0"]}
+-- {"id":250401,"ver":"2.0.0","libVer":"1.0.0","author":"Claudemirovsky","dep":["url>=1.0.0"]}
 
--- ============================= CONSTANTS ==============================
-local id = 250401 -- from a good doujinshi by Ringoya/alp
 local baseURL = "https://novelmania.com.br"
-local name = "Novel Mania"
-
 local qs = Require("url").querystring
 
-local FILTER_GENRES_ID = 100
-local FILTER_GENRES_KEYS = {
+local FILTER_GENRE_ID = 100
+local FILTER_GENRE_KEYS = {
   "Todos",
   "Ação",
   "Adulto",
@@ -43,44 +39,16 @@ local FILTER_GENRES_KEYS = {
   "Yaoi",
   "Yuri"
 }
-local FILTER_GENRES_VALUES = {
-  [0] = "", -- Todos
-  01, -- Ação
-  02, -- Adulto
-  07, -- Artes Marciais
-  03, -- Aventura
-  04, -- Comédia
-  16, -- Cotidiano
-  23, -- Drama
-  27, -- Ecchi
-  22, -- Erótico
-  13, -- Escolar
-  05, -- Fantasia
-  21, -- Harém
-  30, -- Isekai
-  26, -- Magia
-  08, -- Mecha
-  31, -- Medieval
-  24, -- Militar
-  09, -- Mistério
-  10, -- Mitologia
-  11, -- Psicológico
-  36, -- Realidade Virtual
-  12, -- Romance
-  14, -- Sci-fi
-  15, -- Sistema de Jogo
-  17, -- Sobrenatural
-  29, -- Suspense
-  06, -- Terror
-  18, -- Wuxia
-  19, -- Xianxia
-  20, -- Xuanhuan
-  35, -- Yaoi
-  37 -- Yuri
+local FILTER_GENRE_VALUES = {
+  [0] = "",
+  "1", "2", "7", "3", "4", "16", "23", "27", "22", "13",
+  "5", "21", "30", "26", "8", "31", "24", "9", "10", "11",
+  "36", "12", "14", "15", "17", "29", "6", "18", "19", "20",
+  "35", "37"
 }
 
 local FILTER_NATIONALITY_ID = 200
-local FILTER_NATIONALITY_ITEMS = {
+local FILTER_NATIONALITY_KEYS = {
   "Todas",
   "Americana",
   "Angolana",
@@ -89,20 +57,30 @@ local FILTER_NATIONALITY_ITEMS = {
   "Coreana",
   "Japonesa"
 }
+local FILTER_NATIONALITY_VALUES = {
+  [0] = "",
+  "americana",
+  "angolana",
+  "brasileira",
+  "chinesa",
+  "coreana",
+  "japonesa"
+}
 
 local FILTER_STATUS_ID = 300
-local FILTER_STATUS_ITEMS = { "Todos", "Ativo", "Completo", "Pausado", "Parado" }
+local FILTER_STATUS_KEYS = { "Todos", "Ativo", "Completo", "Pausado", "Parado" }
+local FILTER_STATUS_VALUES = { [0] = "", "ativo", "completo", "pausado", "parado" }
 
-local FILTER_ORDERBY_ID = 400
-local FILTER_ORDERBY_ITEMS = {
+local FILTER_ORDER_ID = 400
+local FILTER_ORDER_KEYS = {
   "Qualquer ordem",
   "Ordem alfabética",
   "Nº de Capítulos",
   "Popularidade",
-  "Novidades",
+  "Novidades"
 }
+local FILTER_ORDER_VALUES = { [0] = "", "1", "2", "3", "4" }
 
--- ============================== PASSAGE ===============================
 local function shrinkURL(url)
   return url:gsub("^.-novelmania%.com%.br", "")
 end
@@ -111,159 +89,165 @@ local function expandURL(path)
   return baseURL .. path
 end
 
---- @param chapterURL string
---- @return string
 local function getPassage(chapterURL)
-  local document = GETDocument(expandURL(chapterURL))
-  local htmlElement = document:selectFirst("div#chapter-content")
-  -- remove unwanted elements
-  htmlElement:select("h3, div"):remove()
-  return pageOfElem(htmlElement, true)
+  local doc = GETDocument(expandURL(chapterURL))
+  local content = doc:selectFirst("div#chapter-content")
+  if content then
+    content:select("h3, h2"):remove()
+    return pageOfElem(content, true)
+  end
+  return ""
 end
 
--- =========================== NOVEL DETAILS ============================
----@param document Document
----@return NovelStatus
-local function getStatus(document)
-  local status = document:selectFirst("span.authors:contains(Status:)"):ownText()
-  local status_table = {
-    ["Ativo"] = 0,
-    ["Completo"] = 1,
-    ["Pausado"] = 2
-  }
-  return NovelStatus(status_table[status] or 3)
-end
-
----@param document Document
----@return NovelChapter[]
-local function getChapterList(document)
-  local chapters = document:select("ol.list-inline a")
-  local count = 1
-  local chapterList = AsList(map(chapters, function(el)
-    local chapter = NovelChapter {
-      title = el:selectFirst("strong"):text(),
-      link = shrinkURL(el:attr("href")),
-      release = el:selectFirst("small"):text(),
-      order = count
-    }
-    count = count + 1
-    return chapter
-  end))
-  return chapterList
-end
-
----@param element Element
----@return string
-local function text(element)
-  return element:text()
-end
-
----@param novelURL string
----@return NovelInfo
 local function parseNovel(novelURL)
   local doc = GETDocument(expandURL(novelURL))
-  local info = doc:selectFirst("div.novel-info")
-  local nvinfo = NovelInfo {
-    title = info:selectFirst("div > h1"):text(),
-    imageURL = doc:selectFirst("div.novel-img > img"):attr("src"),
-    description = table.concat(map(doc:select("div.text > p"), text), "\n"),
-    status = NovelStatus(getStatus(info)),
-    authors = { info:selectFirst("span.authors:contains(Autor:)"):ownText() },
-    chapters = getChapterList(doc),
-    genres = map(doc:select("div.tags a"), text)
+  
+  local title = doc:selectFirst("div.novel-info h1")
+  local img = doc:selectFirst("div.novel-img img")
+  local authorElem = doc:selectFirst("span.authors:contains(Autor:)")
+  local statusElem = doc:selectFirst("span.authors:contains(Status:)")
+  local descElems = doc:select("div.text p")
+  local genreElems = doc:select("div.tags ul.list-tags a")
+  local chapterElems = doc:select("ol.list-inline li a")
+  
+  local chapters = AsList(
+    map(chapterElems, function(el)
+      local strong = el:selectFirst("strong")
+      local small = el:selectFirst("small")
+      return NovelChapter {
+        title = strong and strong:text() or el:text(),
+        link = shrinkURL(el:attr("href")),
+        release = small and small:text() or "",
+        order = #chapterElems
+      }
+    end)
+  )
+  
+  local statusText = statusElem and statusElem:ownText() or "Desconhecido"
+  local statusMap = {
+    ["Ativo"] = NovelStatus.PUBLISHING,
+    ["Completo"] = NovelStatus.COMPLETED,
+    ["Pausado"] = NovelStatus.PAUSED,
+    ["Parado"] = NovelStatus.PAUSED
   }
-  return nvinfo
-end
-
--- ============================== FILTERS ===============================
-
----@param filters table
----@param order string
----@return string
-local function createFilterUrl(filters, order)
-  local query = {}
-  if filters[QUERY] then
-    query["titulo"] = filters[QUERY]
-  end
-  if order ~= "" then
-    query["ordem"] = order
-  end
-
-  for key, value in pairs(filters) do
-    if key > 0 and value > 0 then
-      if key == FILTER_GENRES_ID then
-        query["categoria"] = FILTER_GENRES_VALUES[value]
-      elseif key == FILTER_NATIONALITY_ID then
-        query["nacionalidade"] = FILTER_NATIONALITY_ITEMS[value + 1]:lower()
-      elseif key == FILTER_STATUS_ID then
-        query["status"] = FILTER_STATUS_ITEMS[value + 1]:lower()
-      elseif key == FILTER_ORDERBY_ID then
-        query["ordem"] = tostring(value - 1)
-      end
+  
+  local description = ""
+  if #descElems > 0 then
+    local parts = {}
+    for i = 1, #descElems do
+      parts[i] = descElems:get(i - 1):text()
     end
+    description = table.concat(parts, "\n")
   end
-  return qs(query, expandURL("/novels"))
-end
-
--- ============================== LISTING ===============================
----@param element Document
----@return Novel
-local function parseNovelFromElement(element)
-  local imgElement = element:selectFirst("img")
-  return Novel {
-    title = imgElement:attr("alt"):gsub("Capa de ", ""),
-    imageURL = imgElement:attr("src"),
-    link = shrinkURL(element:attr("href"))
+  
+  return NovelInfo {
+    title = title and title:text() or "",
+    imageURL = img and img:attr("src") or "",
+    description = description,
+    authors = { authorElem and authorElem:ownText() or "Desconhecido" },
+    genres = map(genreElems, function(el) return el:text() end),
+    status = statusMap[statusText] or NovelStatus.UNKNOWN,
+    chapters = chapters
   }
 end
 
----@param url string
----@return Novel[]
+local function buildSearchURL(data)
+  local params = {}
+  
+  if data[PAGE] then
+    params["page[page]"] = tostring(data[PAGE])
+  end
+  
+  if data[QUERY] and data[QUERY] ~= "" then
+    params["titulo"] = data[QUERY]
+  end
+  
+  if data[FILTER_GENRE_ID] and data[FILTER_GENRE_ID] > 0 then
+    params["categoria"] = FILTER_GENRE_VALUES[data[FILTER_GENRE_ID]]
+  end
+  
+  if data[FILTER_NATIONALITY_ID] and data[FILTER_NATIONALITY_ID] > 0 then
+    params["nacionalidade"] = FILTER_NATIONALITY_VALUES[data[FILTER_NATIONALITY_ID]]
+  end
+  
+  if data[FILTER_STATUS_ID] and data[FILTER_STATUS_ID] > 0 then
+    params["status"] = FILTER_STATUS_VALUES[data[FILTER_STATUS_ID]]
+  end
+  
+  if data[FILTER_ORDER_ID] and data[FILTER_ORDER_ID] > 0 then
+    params["ordem"] = FILTER_ORDER_VALUES[data[FILTER_ORDER_ID]]
+  end
+  
+  return qs(params, expandURL("/novels"))
+end
+
 local function parseList(url)
-  local document = GETDocument(url)
-  local selector = "div.top-novels a"
-  return map(document:select(selector), function(link)
+  local doc = GETDocument(url)
+  local novelElems = doc:select("div.top-novels a")
+  
+  return map(novelElems, function(link)
     local img = link:selectFirst("img")
+    if not img then
+      return nil
+    end
+    
+    local alt = img:attr("alt")
+    local title = alt:gsub("^Capa de ", ""):gsub("^Capa da novel ", "")
+    
     return Novel {
-      title = img:attr("alt"):gsub("Capa de ", ""),
+      title = title,
       imageURL = img:attr("src"),
       link = shrinkURL(link:attr("href"))
     }
   end)
 end
 
----@param listname string
----@param order string
----@return Listing
-local function listing(listname, order)
-  return Listing(listname, true, function(data)
-    return parseList(createFilterUrl(data, order))
+local function listing(name, order)
+  return Listing(name, true, function(data)
+    local params = {}
+    
+    if data[PAGE] then
+      params["page[page]"] = tostring(data[PAGE])
+    end
+    
+    if order ~= "" then
+      params["ordem"] = order
+    end
+    
+    return parseList(qs(params, expandURL("/novels")))
   end)
 end
 
 return {
-  id = id,
-  name = name,
+  id = 250401,
+  name = "Novel Mania",
   baseURL = baseURL,
-  imageURL = expandURL("/assets/logo-blue-ccbd5d317242b0f0479edd2cad954fd235dbdfeb662bb338d987f8f57e3794a2.png"),
-  listings = {
-    listing("Populares", "2"),
-    listing("Recentes", "3")
-  },
+  imageURL = expandURL("/vite/assets/logo-5etzsy8L.png"),
+  
   hasSearch = true,
-  isSearchIncrementing = false,
-  search = function(data)
-    return parseList(createFilterUrl(data, ""))
-  end,
-  searchFilters = {
-    DropdownFilter(FILTER_GENRES_ID, "Gênero", FILTER_GENRES_KEYS),
-    DropdownFilter(FILTER_NATIONALITY_ID, "Nacionalidade", FILTER_NATIONALITY_ITEMS),
-    DropdownFilter(FILTER_STATUS_ID, "Status", FILTER_STATUS_ITEMS),
-    DropdownFilter(FILTER_ORDERBY_ID, "Ordenar por", FILTER_ORDERBY_ITEMS),
+  isSearchIncrementing = true,
+  
+  listings = {
+    listing("Populares", "3"),
+    listing("Recentes", "4")
   },
-  getPassage = getPassage,
-  chapterType = ChapterType.HTML,
+  
+  searchFilters = {
+    DropdownFilter(FILTER_GENRE_ID, "Gênero", FILTER_GENRE_KEYS),
+    DropdownFilter(FILTER_NATIONALITY_ID, "Nacionalidade", FILTER_NATIONALITY_KEYS),
+    DropdownFilter(FILTER_STATUS_ID, "Status", FILTER_STATUS_KEYS),
+    DropdownFilter(FILTER_ORDER_ID, "Ordenar por", FILTER_ORDER_KEYS)
+  },
+  
+  search = function(data)
+    return parseList(buildSearchURL(data))
+  end,
+  
   parseNovel = parseNovel,
-  expandURL = expandURL,
-  shrinkURL = shrinkURL
+  getPassage = getPassage,
+  
+  chapterType = ChapterType.HTML,
+  
+  shrinkURL = shrinkURL,
+  expandURL = expandURL
 }
