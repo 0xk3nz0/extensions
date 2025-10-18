@@ -127,6 +127,13 @@
       "website": ""
     },
     {
+      "id": 588660643,
+      "name": "kodmaster23",
+      "desc": "Worked on Novel Mania",
+      "imageURL": "",
+      "website": ""
+    },
+    {
       "id": -306470064,
       "name": "unTanya",
       "desc": "Worked on Xiaowaz",
@@ -786,9 +793,9 @@
       "fileName": "NovelMania",
       "imageURL": "https://novelmania.com.br/vite/assets/logo-5etzsy8L.png",
       "lang": "pt",
-      "ver": "2.0.1",
+      "ver": "2.0.0",
       "libVer": "1.0.0",
-      "md5": "fd19d53fb6148cb1c98a7cb0cb8422c2fb68f33f68962d6251360c1f9f4aee7d",
+      "md5": "dd9ec0ae5774786bc07e965dcf339da0d04e93f09022c45f18dc8ee4e2614798",
       "type": "LuaScript"
     },
     {

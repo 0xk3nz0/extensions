@@ -1,4 +1,4 @@
--- {"id":250401,"ver":"2.0.1","libVer":"1.0.0","author":"Claudemirovsky","dep":["url>=1.0.0"]}
+-- {"id":250401,"ver":"2.0.0","libVer":"1.0.0","author":"Claudemirovsky, kodmaster23","dep":["url>=1.0.0"]}
 
 local baseURL = "https://novelmania.com.br"
 local qs = Require("url").querystring
@@ -8,16 +8,24 @@ local FILTER_GENRE_KEYS = {
   "Todos",
   "Ação",
   "Adulto",
+  "Antologia",
   "Artes Marciais",
   "Aventura",
   "Comédia",
+  "Conto",
   "Cotidiano",
+  "Cultivo",
+  "Distopia",
   "Drama",
   "Ecchi",
   "Erótico",
   "Escolar",
+  "Exploração",
   "Fantasia",
+  "Futurista",
   "Harém",
+  "Histórico",
+  "Horror",
   "Isekai",
   "Magia",
   "Mecha",
@@ -26,11 +34,13 @@ local FILTER_GENRE_KEYS = {
   "Mistério",
   "Mitologia",
   "Psicológico",
+  "Punk",
   "Realidade Virtual",
   "Romance",
   "Sci-fi",
   "Sistema de Jogo",
   "Sobrenatural",
+  "Super-Herói",
   "Suspense",
   "Terror",
   "Wuxia",
@@ -41,9 +51,10 @@ local FILTER_GENRE_KEYS = {
 }
 local FILTER_GENRE_VALUES = {
   [0] = "",
-  "1", "2", "7", "3", "4", "16", "23", "27", "22", "13",
-  "5", "21", "30", "26", "8", "31", "24", "9", "10", "11",
-  "36", "12", "14", "15", "17", "29", "6", "18", "19", "20",
+  "1", "2", "39", "7", "3", "4", "38", "16", "47", "41",
+  "23", "27", "22", "13", "45", "5", "40", "21", "42", "43",
+  "30", "26", "8", "31", "24", "9", "10", "11", "44", "36",
+  "12", "14", "15", "17", "46", "29", "6", "18", "19", "20",
   "35", "37"
 }
 
@@ -79,7 +90,7 @@ local FILTER_ORDER_KEYS = {
   "Popularidade",
   "Novidades"
 }
-local FILTER_ORDER_VALUES = { [0] = "", "1", "2", "3", "4" }
+local FILTER_ORDER_VALUES = { [0] = "", "0", "1", "2", "3" }
 
 local function shrinkURL(url)
   return url:gsub("^.-novelmania%.com%.br", "")
@@ -138,10 +149,10 @@ local function parseNovel(novelURL)
   }
   
   local description = ""
-  if #descElems > 0 then
+  if descElems:size() > 0 then
     local parts = {}
-    for i = 1, #descElems do
-      parts[i] = descElems:get(i - 1):text()
+    for i = 0, descElems:size() - 1 do
+      parts[i + 1] = descElems:get(i):text()
     end
     description = table.concat(parts, "\n")
   end
@@ -191,23 +202,27 @@ end
 
 local function parseList(url)
   local doc = GETDocument(url)
-  local novelElems = doc:select("div.top-novels a")
+  local novelContainers = doc:select("div.top-novels")
   
-  return map(novelElems, function(link)
-    local img = link:selectFirst("img")
-    if not img then
-      return nil
+  local results = {}
+  for i = 0, novelContainers:size() - 1 do
+    local container = novelContainers:get(i)
+    local img = container:selectFirst("img.card-image")
+    local link = img and img:parent():parent()
+    
+    if link then
+      local alt = img:attr("alt")
+      local title = alt:gsub("^Capa de ", ""):gsub("^Capa da novel ", "")
+      
+      results[#results + 1] = Novel {
+        title = title,
+        imageURL = img:attr("src"),
+        link = shrinkURL(link:attr("href"))
+      }
     end
-    
-    local alt = img:attr("alt")
-    local title = alt:gsub("^Capa de ", ""):gsub("^Capa da novel ", "")
-    
-    return Novel {
-      title = title,
-      imageURL = img:attr("src"),
-      link = shrinkURL(link:attr("href"))
-    }
-  end)
+  end
+  
+  return results
 end
 
 local function listing(name, order)
@@ -218,7 +233,25 @@ local function listing(name, order)
       params["page[page]"] = tostring(data[PAGE])
     end
     
-    if order ~= "" then
+    if data[QUERY] and data[QUERY] ~= "" then
+      params["titulo"] = data[QUERY]
+    end
+    
+    if data[FILTER_GENRE_ID] and data[FILTER_GENRE_ID] > 0 then
+      params["categoria"] = FILTER_GENRE_VALUES[data[FILTER_GENRE_ID]]
+    end
+    
+    if data[FILTER_NATIONALITY_ID] and data[FILTER_NATIONALITY_ID] > 0 then
+      params["nacionalidade"] = FILTER_NATIONALITY_VALUES[data[FILTER_NATIONALITY_ID]]
+    end
+    
+    if data[FILTER_STATUS_ID] and data[FILTER_STATUS_ID] > 0 then
+      params["status"] = FILTER_STATUS_VALUES[data[FILTER_STATUS_ID]]
+    end
+    
+    if data[FILTER_ORDER_ID] and data[FILTER_ORDER_ID] > 0 then
+      params["ordem"] = FILTER_ORDER_VALUES[data[FILTER_ORDER_ID]]
+    elseif order ~= "" then
       params["ordem"] = order
     end
     
