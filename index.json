@@ -127,6 +127,13 @@
 			"website": ""
 		},
 		{
+			"id": 588660643,
+			"name": "kodmaster23",
+			"desc": "Worked on Novel Mania",
+			"imageURL": "",
+			"website": ""
+		},
+		{
 			"id": -306470064,
 			"name": "unTanya",
 			"desc": "Worked on Xiaowaz",
@@ -784,11 +791,11 @@
 			"id": 250401,
 			"name": "Novel Mania",
 			"fileName": "NovelMania",
-			"imageURL": "https://novelmania.com.br/assets/logo-blue-ccbd5d317242b0f0479edd2cad954fd235dbdfeb662bb338d987f8f57e3794a2.png",
+			"imageURL": "https://novelmania.com.br/vite/assets/logo-5etzsy8L.png",
 			"lang": "pt",
-			"ver": "1.0.0",
+			"ver": "2.0.0",
 			"libVer": "1.0.0",
-			"md5": "929112ddb8e8585cdced411a1592767de0effa5ed7d6ad00a24ebcabedee5518",
+			"md5": "dd9ec0ae5774786bc07e965dcf339da0d04e93f09022c45f18dc8ee4e2614798",
 			"type": "LuaScript"
 		},
 		{
@@ -896,9 +903,9 @@
 			"fileName": "Xiaowaz",
 			"imageURL": "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/Xiaowaz.png",
 			"lang": "fr",
-			"ver": "1.0.2",
+			"ver": "1.1.0",
 			"libVer": "1.0.0",
-			"md5": "a7ead7d2b40cc3a2703eebd6fc3387349bfb0d0af81adff4593568a35dcf7b99",
+			"md5": "ba5605b4a441c3a2be38caa02a6be288b10eb68872f33a8562f8ca4a5e6754d4",
 			"type": "LuaScript"
 		}
 	],

@@ -1,22 +1,11 @@
--- {"id":1915581930,"ver":"1.0.2","libVer":"1.0.0","author":"unTanya"}
+-- {"id":1915581930,"ver":"1.1.0","libVer":"1.0.0","author":"unTanya"}
 
----@class Novel
----@field title string
----@field link string
----@field imageURL string
-local Novel = Novel
-
--- Base URL of the website
 local baseURL = "https://xiaowaz.fr"
 
---- Ensure an absolute URL (prefix baseURL when the input is relative like "?p=123" or "articles/...").
----@param url string
----@return string
+--- Ensure absolute URL
 local function ensureAbsolute(url)
     if not url or url == "" then return url end
-    -- Already absolute (http/https)
     if url:match("^https?://") then return url end
-    -- Join with baseURL (handles both "?p=..." and "path/..." cases)
     if url:sub(1,1) == "/" then
         return baseURL .. url
     else
@@ -24,111 +13,186 @@ local function ensureAbsolute(url)
     end
 end
 
---- Get passage (chapter content) from a given chapter URL
----@param chapterURL string @Can be absolute or relative ("?p=..."/"articles/...")
----@return string @Cleaned HTML text
-local function getPassage(chapterURL)
-    -- Always fetch using an absolute URL to avoid "Expected URL scheme" errors
-    local absURL = ensureAbsolute(chapterURL)
-    local doc = GETDocument(absURL):selectFirst("div.entry-content")
-    if doc == nil then
-        return "Chapter not found."
-    end
-    return pageOfElem(doc, true)
+--- Normalize chapter URL (remove fragments, utm, etc.)
+local function normalizeURL(url)
+    if not url then return nil end
+    url = url:gsub("#.*$", "")
+    url = url:gsub("%?utm_[^&]+", "")
+    return url
 end
 
---- Listing latest chapters through the RSS feed with pagination
----@param data table @Shosetsu passes { [PAGE] = number }
----@return Novel[]
-local function latest(data)
-    local page = data[PAGE] or 1
-    local rssURL = baseURL .. "/index.php/feed/?paged=" .. page
-    local rss = GETDocument(rssURL)
+--- Get chapter passage
+local function getPassage(chapterURL)
+    local absURL = ensureAbsolute(chapterURL)
+    local doc = GETDocument(absURL)
+    local content = doc:selectFirst("div.entry-content")
+    if not content then return "Chapter not found." end
+    -- remove unwanted blocks
+    content:select("div.wp-post-navigation"):remove()
+    content:select("div.abh_box"):remove()
+    return pageOfElem(content, true)
+end
+
+--- Listing all series directly from the navbar
+local function allSeries(_)
+    local doc = GETDocument(baseURL)
     local results = {}
-    local items = rss:select("item")
+    local seen = {}
 
-    print("DEBUG: page=" .. page .. " -> found " .. items:size() .. " items in RSS")
+    local parent = doc:selectFirst("nav.main-navigation li.page-item-866 ul.children")
+    if not parent then return {} end
 
-    -- Si 0 item → fin immédiate
-    if items:size() == 0 then
-        return {}
-    end
+    local links = parent:select("li a")
 
-    for i = 0, items:size() - 1 do
-        local item = items:get(i)
-        local titleElem = item:selectFirst("title")
-        local guidElem  = item:selectFirst("guid")
+    for i = 0, links:size() - 1 do
+        local a = links:get(i)
+        local href = ensureAbsolute(a:attr("href"))
+        local title = a:text()
+        if not title or title == "" then
+            title = "Unknown"
+        end
 
-        local title = titleElem and titleElem:text() or "Untitled"
-        local link  = guidElem and guidElem:text() or ""
-
-        if link ~= "" then
-            -- Nettoyage des UTM
-            link = link:gsub("%?utm_source.*", "")
-
-            -- Si relatif, normaliser
-            if link:match("^%?p=") then
-                link = baseURL .. "/articles/" .. link
-            end
-
-            -- Chercher la cover une seule fois par œuvre
-            local cover = "@icon/Xiaowaz.png"
-            local coverImg = GETDocument(link):selectFirst("img.attachment-post-thumbnail")
-            if coverImg then
-                cover = coverImg:attr("src")
-            end
-
+        if href and href ~= "" and not seen[href] then
+            seen[href] = true
             table.insert(results, Novel {
                 title = title,
-                link = link,
-                imageURL = cover
+                link = href,
+                imageURL = "@icon/Xiaowaz.png"
             })
         end
-    end
-
-    -- Si on a trouvé moins de 10 items → fin de pagination
-    if items:size() < 10 then
-        print("DEBUG: page=" .. page .. " is the last page (found only " .. items:size() .. " items)")
-        return {}
     end
 
     return results
 end
 
+-- Cache all series for title lookup
+local seriesCache
+local function getAllSeries()
+    if not seriesCache then
+        seriesCache = allSeries()
+    end
+    return seriesCache
+end
 
-
-
-
---- Parse a "novel" page (actually a single article on Xiaowaz)
----@param novelURL string @Can be absolute or relative
----@return NovelInfo
+--- Parse a series page (cover + synopsis + chapters)
 local function parseNovel(novelURL)
-    -- Always expand to absolute before fetching
     local url = ensureAbsolute(novelURL)
     local doc = GETDocument(url)
 
-    local titleElem = doc:selectFirst("h1.entry-title")
-    local title = titleElem and titleElem:text() or "Chapter"
+    -- title: priority to <head><title>
+    local title = "Unknown series"
+    local headTitle = doc:selectFirst("title")
+    if headTitle then
+        local raw = headTitle:text()
+        if raw and raw ~= "" then
+            title = raw:gsub("%s*|%s*Xiaowaz$", "")
+        end
+    end
 
-    -- Try to get a cover if present on the article page
-    -- (class often used: "attachment-post-thumbnail size-post-thumbnail wp-post-image")
-    local imgElem = doc:selectFirst("img.attachment-post-thumbnail")
-    local cover = (imgElem and imgElem:attr("src") and imgElem:attr("src") ~= "") and imgElem:attr("src") or "@icon/Xiaowaz.png"
+    -- fallback 1: h1.entry-title
+    if title == "Unknown series" then
+        local titleElem = doc:selectFirst("h1.entry-title")
+        if titleElem then title = titleElem:text() end
+    end
+
+    -- fallback 2: search in allSeries (nav FR)
+    if title == "Unknown series" then
+        for _, novel in ipairs(getAllSeries()) do
+            if novel.link == url then
+                title = novel.title
+                break
+            end
+        end
+    end
+
+    -- cover
+    local cover = "@icon/Xiaowaz.png"
+    local entry = doc:selectFirst("div.entry-content")
+    if entry then
+        local firstImg = entry:selectFirst("p img, img.aligncenter, img.alignleft, img.size-full")
+        if firstImg then
+            local src = firstImg:attr("src")
+            if src and src ~= "" then cover = src end
+        end
+    end
+
+    -- synopsis
+    local description = ""
+    if entry then
+        local ps = entry:select("p")
+        local parts = {}
+        for i=0, ps:size()-1 do
+            local p = ps:get(i)
+            local text = p:text()
+            if text and text:match("%S") then
+                table.insert(parts, text)
+                if #parts >= 3 then break end
+            end
+        end
+        if #parts > 0 then
+            description = table.concat(parts, "\n\n")
+        end
+    end
+    if description == "" then description = title end
+
+    -- chapters
+    local chapters = {}
+    local seenChapters = {}
+
+    if entry then
+        local list = entry:select("ul.lcp_catlist li a")
+        if list and list:size() > 0 then
+            for i=0, list:size()-1 do
+                local a = list:get(i)
+                local href = ensureAbsolute(a:attr("href"))
+                href = normalizeURL(href)
+                if href and not seenChapters[href] then
+                    seenChapters[href] = true
+                    local ctitle = a:text()
+                    if not ctitle or ctitle == "" then
+                        ctitle = "Chapter"
+                    end
+                    table.insert(chapters, NovelChapter {
+                        title = ctitle,
+                        link = href
+                    })
+                end
+            end
+        else
+            local elems = entry:select("p, li")
+            for i=0, elems:size()-1 do
+                local links = elems:get(i):select("a[href]")
+                for j=0, links:size()-1 do
+                    local a = links:get(j)
+                    local href = a:attr("href") or ""
+                    if href:find("/articles/") then
+                        href = ensureAbsolute(href)
+                        href = normalizeURL(href)
+                        if href and not seenChapters[href] then
+                            seenChapters[href] = true
+                            local ctitle = a:text()
+                            if not ctitle or ctitle == "" then
+                                ctitle = "Chapter"
+                            end
+                            table.insert(chapters, NovelChapter {
+                                title = ctitle,
+                                link = href
+                            })
+                        end
+                    end
+                end
+            end
+        end
+    end
 
     return NovelInfo {
         title = title,
-        description = title,
+        description = description,
         imageURL = cover,
-        chapters = AsList({
-            NovelChapter {
-                title = title,
-                link = novelURL, -- keep original; getPassage will ensureAbsolute() before fetching
-            }
-        })
+        chapters = AsList(chapters)
     }
 end
 
--- Main extension export
 return {
     id = 1915581930,
     name = "Xiaowaz",
@@ -136,35 +200,25 @@ return {
     imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/Xiaowaz.png",
 
     listings = {
-        Listing("Latest Chapters", true, latest)
+        Listing("All Series", false, allSeries)
     },
 
     parseNovel = parseNovel,
     getPassage = getPassage,
     chapterType = ChapterType.HTML,
 
-    -- Keep shrink/expand, but make them tolerant with absolute URLs.
-    shrinkURL = function(url, _)
-        if not url or url == "" then
-            return url
-        end
-        if url:sub(1, #baseURL) == baseURL then
-            return url:gsub(baseURL .. "/", "")
+    shrinkURL = function(url,_)
+        if not url or url == "" then return url end
+        if url:sub(1,#baseURL) == baseURL then
+            return url:gsub(baseURL.."/","")
         end
         return url
     end,
 
-    expandURL = function(url, _)
-        -- If it's already absolute, return as-is
-        if url and url:match("^https?://") then
-            return url
-        end
-        -- Otherwise, prefix baseURL safely
-        if url and url:sub(1, 1) == "/" then
-            return baseURL .. url
-        else
-            return baseURL .. "/" .. (url or "")
-        end
+    expandURL = function(url,_)
+        if url and url:match("^https?://") then return url end
+        if url and url:sub(1,1) == "/" then return baseURL..url end
+        return baseURL.."/"..(url or "")
     end,
 
     hasSearch = false,
