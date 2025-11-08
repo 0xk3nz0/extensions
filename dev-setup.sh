@@ -45,5 +45,5 @@ fi
 if [ "$DOWNLOAD_TESTER" = true ]; then
   ## Download extension tester
   mkdir -p bin
-  download "https://gitlab.com/api/v4/groups/12585416/-/packages/maven/app/shosetsu/extension-tester/2.1.0/extension-tester-2.1.0.jar" "bin/extension-tester.jar"
+  download "https://gitlab.com/api/v4/groups/12585416/-/packages/maven/app/shosetsu/extension-tester/2.1.1/extension-tester-2.1.1-all.jar" "bin/extension-tester.jar"
 fi
