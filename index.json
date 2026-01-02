@@ -38,7 +38,7 @@
 		{
 			"id": -931466336,
 			"name": "JFronny",
-			"desc": "Worked on Questionable Questing, SpaceBattles, Sufficient Velocity, Wildbow (Parahumans), XenForo",
+			"desc": "Worked on AltHistory, Questionable Questing, SpaceBattles, Sufficient Velocity, Wildbow (Parahumans), XenForo",
 			"imageURL": "",
 			"website": ""
 		},
@@ -168,9 +168,9 @@
 		},
 		{
 			"name": "XenForo",
-			"ver": "1.0.9",
+			"ver": "1.0.10",
 			"url": null,
-			"hash": "31ececc4c83fecdedf03462553ff6086e4b9f17264507282fe40fe7c982da092"
+			"hash": "a6f80230b5cdd69b742ba53a92e51f6bc0cef1a49ce2dc421f0ed0e1928371eb"
 		},
 		{
 			"name": "dkjson",
@@ -873,6 +873,17 @@
 			"ver": "1.1.2",
 			"libVer": "1.0.0",
 			"md5": "18a138d49c266ba0535f31d145039b01428ba9026917a8f476e59e8868119345",
+			"type": "LuaScript"
+		},
+		{
+			"id": 1247865462,
+			"name": "AltHistory",
+			"fileName": "AltHistory",
+			"imageURL": "https://althistory.com/data/svg/25/1/1766884702/favicon_192x192.png",
+			"lang": "en",
+			"ver": "1.0.0",
+			"libVer": "1.0.0",
+			"md5": "f9322e03c9a0be0d23e45b207dab241fdd0f5c50dc7035d9a0902aa52adb1f46",
 			"type": "LuaScript"
 		},
 		{
