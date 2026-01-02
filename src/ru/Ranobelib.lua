@@ -1,7 +1,7 @@
 -- {"id":73,"ver":"2.0.0","libVer":"1.0.0","author":"Rider21","dep":["dkjson>=1.0.1"]}
 
 local baseURL = "https://ranobelib.me"
-local apiURL = "https://api.lib.social/api/manga"
+local apiURL = "https://api.cdnlibs.org/api/manga"
 local dkjson = Require("dkjson")
 
 local ORDER_BY_FILTER = 3
