@@ -121,7 +121,9 @@ local function getPassage(chapterURL)
 end
 
 local function parseNovel(novelURL, loadChapters)
-	local response = dkjson.GET(apiURL .. "/" .. novelURL .. allfields).data
+	local headersbuilder = HeadersBuilder()
+	headersbuilder:add("Site-Id", "3")
+	local response = dkjson.GET(apiURL .. "/" .. novelURL .. allfields, headersbuilder:build()).data
 
 	local novel = NovelInfo {
 		title = response.rus_name or response.name,
