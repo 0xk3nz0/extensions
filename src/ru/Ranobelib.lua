@@ -1,4 +1,4 @@
--- {"id":73,"ver":"2.0.0","libVer":"1.0.0","author":"Rider21","dep":["dkjson>=1.0.1"]}
+-- {"id":73,"ver":"2.0.1","libVer":"1.0.0","author":"Rider21","dep":["dkjson>=1.0.1"]}
 
 local baseURL = "https://ranobelib.me"
 local apiURL = "https://api.cdnlibs.org/api/manga"
@@ -111,10 +111,19 @@ local function getPassage(chapterURL)
 				end
 			end
 			if v.type == "image" then
-				return '<img alt="" src="' .. v.attrs.images[0].image .. '" />'
+				local url
+				for i,attachment in ipairs(doc.data.attachments) do
+					if attachment.name == v.attrs.images[1].image then
+						url = attachment.url
+						break
+					end
+				end
+				print('<img alt="" src="' .. baseURL .. url .. '" />')
+				return '<img alt="" src="' .. baseURL .. url .. '" />'
 			end
+			return ""
 		end)
-		chap = table.concat(html, "")
+		chap = table.concat(html)
 	end
 
 	return pageOfElem(Document(chap))

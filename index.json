@@ -276,9 +276,9 @@
 			"fileName": "Ranobelib",
 			"imageURL": "https://ranobelib.me/images/logo/rl/icon.png",
 			"lang": "ru",
-			"ver": "2.0.0",
+			"ver": "2.0.1",
 			"libVer": "1.0.0",
-			"md5": "d4b45d380af171bea7ed9a3f30add36e15ebd6e8167b9f728df56a57bde4cbf2",
+			"md5": "047169fdf287118850f61383efd905fbe769c0dcbb585c03da9969f2e27769e5",
 			"type": "LuaScript"
 		},
 		{
