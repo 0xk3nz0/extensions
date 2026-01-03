@@ -409,7 +409,7 @@ return {
     id = 95562,
     name = "Read From Net",
     baseURL = baseURL,
-    imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/ReadFromNet.png",
+    imageURL = "https://shosetsuorg.gitlab.io/extensions/icons/ReadFromNet.png",
     hasSearch = true,
     listings = {
         Listing("Default", true, getListing)

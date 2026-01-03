@@ -3,7 +3,7 @@
 return Require("novelvault")("https://lightnovelplus.com", {
 	id = 174133,
 	name = "Light Novel Plus",
-	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/LightNovelPlus.png",
+	imageURL = "https://shosetsuorg.gitlab.io/extensions/icons/LightNovelPlus.png",
 
 	searchParam = "book/search.html",
 	pageParam = "page_num",

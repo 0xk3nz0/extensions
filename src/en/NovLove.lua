@@ -3,7 +3,7 @@
 return Require("novelvault")("https://novlove.com", {
 	id = 2,
 	name = "NovLove (Boxnovel)",
-	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NovLove.png",
+	imageURL = "https://shosetsuorg.gitlab.io/extensions/icons/NovLove.png",
 
 	novelParam = "novel",
 	authorParam = "nov-love-author",

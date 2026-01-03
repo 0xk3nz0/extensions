@@ -348,7 +348,7 @@ return {
 	id = 28505740,
 	name = "NOVA",
 	baseURL = baseURL,
-	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NOVA.png",
+	imageURL = "https://shosetsuorg.gitlab.io/extensions/icons/NOVA.png",
 	hasCloudFlare = true,
 	hasSearch = true,
 	chapterType = ChapterType.HTML,

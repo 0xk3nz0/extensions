@@ -233,7 +233,7 @@ return {
     id = 95570,
     name = "NovelHall",
     baseURL = baseURL,
-    imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NovelHall.png",
+    imageURL = "https://shosetsuorg.gitlab.io/extensions/icons/NovelHall.png",
     hasSearch = true,
     isSearchIncrementing = false,
     search = search,

@@ -3,7 +3,7 @@
 return Require("XenForo")("https://forum.questionablequesting.com/", {
     id = 1915581632,
     name = "Questionable Questing",
-    imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/QuestionableQuesting.png",
+    imageURL = "https://shosetsuorg.gitlab.io/extensions/icons/QuestionableQuesting.png",
     forums = {
         {
             title = "Creative Writing",

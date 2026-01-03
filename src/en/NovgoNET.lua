@@ -3,7 +3,7 @@
 return Require("novelvault")("https://novgo.net", {
 	id = 111359,
 	name = "Novgo (NET)",
-	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NovgoNET.png",
+	imageURL = "https://shosetsuorg.gitlab.io/extensions/icons/NovgoNET.png",
 
 	listingConfigs = {
 		{ name = "Hot Novel", incrementing = true, param = "hot-novel" },
