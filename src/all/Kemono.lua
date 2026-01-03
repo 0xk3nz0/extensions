@@ -1,24 +1,44 @@
--- {"id":93278,"ver":"1.0.3","libVer":"1.0.0","author":"TechnoJo4","dep":["url>=1.0.0","dkjson>=1.0.0"]}
+-- {"id":93278,"ver":"1.0.4","libVer":"1.0.0","author":"TechnoJo4","dep":["url>=1.0.0","dkjson>=1.0.0"]}
 
-local baseURL = "https://kemono.su"
+local baseURL = "https://kemono.cr"
 local apiURL = baseURL .. "/api/v1"
 
 local json = Require("dkjson")
 
+local SERVICES = {
+    ["patreon"] = "Patreon",
+    ["fanbox"] = "Pixiv Fanbox",
+    ["fantia"] = "Fantia",
+    ["afdian"] = "Afdian",
+    ["boosty"] = "Boosty",
+    ["gumroad"] = "Gumroad",
+    ["subscribestar"] = "SubscribeStar",
+    ["dlsite"] = "DLsite"
+}
+
+local descriptionFormat = "Service: %s"
+    .. "\nProfile ID: %s"
+
 local _creators
-local _postCache = {}
+
+-- kemono is currently serving JSON as text/css for... reasons?
+local headers = HeadersBuilder():add("Accept", "text/css"):build()
+local function jsonGET(url)
+    local res = Request(GET(url, headers))
+    return json.decode(res:body():string())
+end
 
 local function creators()
     if not _creators then
-        -- json.GET only automatically decodes application/json responses, which this isn't
-        local res = Request(GET(apiURL .. "/creators.txt"))
-        _creators = json.decode(res:body():string())
+        _creators = jsonGET(apiURL .. "/creators")
     end
     return _creators
 end
 
 local function shrinkURL(url)
-    return url:gsub("^.-kemono%.party/?", ""):gsub("^.-kemono%.su/?", "")
+    return url:gsub("^.-kemono%.party/?", "")
+        :gsub("^.-kemono%.su/?", "")
+        :gsub("^.-kemono%.cr/?", "")
 end
 
 local function expandURL(url)
@@ -43,7 +63,7 @@ return {
     id = 93278,
     name = "Kemono",
     baseURL = baseURL,
-    imageURL = "https://kemono.su/static/klogo.png",
+    imageURL = "https://kemono.cr/static/klogo.png",
     hasSearch = true,
     chapterType = ChapterType.HTML,
 
@@ -52,42 +72,42 @@ return {
             return parseListing(creators())
         end),
         Listing("Favorites", false, function(data)
-            return parseListing(json.GET(apiURL .. "/account/favorites"))
+            return parseListing(jsonGET(apiURL .. "/account/favorites"))
         end)
     },
 
     getPassage = function(chapterURL)
-        local content = _postCache[chapterURL] or json.GET(apiURL .. chapterURL).post.content
+        local content = jsonGET(apiURL .. chapterURL).post.content
         return "<!DOCTYPE html><html><head></head><body>" .. content .. "</body></html>"
     end,
 
     parseNovel = function(novelURL, loadChapters)
-        local name = novelURL
+        local creator
         for _,v in pairs(creators()) do
             if novelURL == creatorURL(v) then
-                name = v.name
+                creator = v
             end
         end
 
         local info = NovelInfo {
-            title = name,
-            imageURL = baseURL .. "/banners" .. novelURL:gsub("user/", "")
+            title = creator.name,
+            imageURL = baseURL .. "/icons/" .. creator.service .. "/" .. creator.id,
+            description = string.format(descriptionFormat, creator.service, creator.id)
         }
 
         if loadChapters then
             local o = 0
             local posts = {}
             while true do
-                local page = json.GET(apiURL .. novelURL .. "?o="..tostring(o))
+                local page = jsonGET(apiURL .. novelURL .. "/posts?o="..tostring(o))
                 if not page or #page == 0 then break end
                 o = o + 50
                 posts[#posts+1] = page
             end
 
             info:setChapters(AsList(filter(map(flatten(posts), function(v, i)
-                if v.content and #v.content > #("<p><br></p>") then
+                if v.substring and #v.substring > #("<p><br></p>") then
                     local href = novelURL .. "/post/" .. v.id
-                    _postCache[href] = v.content
 
                     return NovelChapter {
                         order = #posts - i,
