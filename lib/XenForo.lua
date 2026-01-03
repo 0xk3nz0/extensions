@@ -1,4 +1,4 @@
--- {"ver":"1.0.9","author":"JFronny","dep":["unhtml>=1.0.0","url>=1.0.0"]}
+-- {"ver":"1.0.10","author":"JFronny","dep":["unhtml>=1.0.0","url>=1.0.0"]}
 
 local HTMLToString = Require("unhtml").HTMLToString
 local qs = Require("url").querystring
@@ -48,7 +48,6 @@ function defaults:getPassage(url)
     local post = doc:selectFirst("#js-" .. id)
     local message = post:selectFirst(".bbWrapper")
     message:select(".bbCodeBlock-expandLink, .bbCodeBlock-shrinkLink"):remove()
-    message:prepend("<h1>" .. post:selectFirst(".threadmarkLabel"):text() .. "</h1>")
 
     return pageOfElem(message, true)
 end
@@ -263,7 +262,8 @@ return function(baseURL, _self)
             local url = baseURL .. "forums/." .. l.forum .. "/page-" .. page .. "/"
             local doc = GETDocument(url)
 
-            local pageCount = tonumber(doc:selectFirst(".pageNav-main .pageNav-page:last-of-type a"):text())
+            local pageCountElem = doc:selectFirst(".pageNav-main .pageNav-page:last-of-type a")
+            local pageCount = tonumber(pageCountElem and pageCountElem:text() or "1")
             if page > pageCount then return {} end
 
             return mapNotNil(doc:select(".js-threadList .structItem--thread"), function(v)
