@@ -3,7 +3,7 @@
 return Require("novelvault")("https://allnovelfull.blog", {
 	id = 233218,
 	name = "All Novel Full",
-	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/AllNovelFull.png",
+	imageURL = "https://shosetsuorg.gitlab.io/extensions/icons/AllNovelFull.png",
 
 	novelParam = "book",
 	authorParam = "all-novel-full-author",

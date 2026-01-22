@@ -80,7 +80,7 @@ return {
 	id = 701,
 	name = "Renovels",
 	baseURL = baseURL,
-	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/Renovels.png",
+	imageURL = "https://shosetsuorg.gitlab.io/extensions/icons/Renovels.png",
 	chapterType = ChapterType.HTML,
 
 	listings = {

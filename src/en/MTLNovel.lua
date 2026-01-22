@@ -140,7 +140,7 @@ return {
 	id = 573,
 	name = "MTLNovel",
 	baseURL = baseURL,
-	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/MTLNovel.png",
+	imageURL = "https://shosetsuorg.gitlab.io/extensions/icons/MTLNovel.png",
 	hasSearch = true,
 	chapterType = ChapterType.HTML,
 

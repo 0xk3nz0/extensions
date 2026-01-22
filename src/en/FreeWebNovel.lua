@@ -3,7 +3,7 @@
 return Require("novelvault")("https://freewebnovel.com", {
 	id = 325107,
 	name = "Free Web Novel",
-	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/FreeWebNovel.png",
+	imageURL = "https://shosetsuorg.gitlab.io/extensions/icons/FreeWebNovel.png",
 
 	isSearchPOST = true,
 	pageParam = "", -- No param, it's `/X`

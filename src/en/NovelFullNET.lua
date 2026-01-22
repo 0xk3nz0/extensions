@@ -3,7 +3,7 @@
 return Require("novelvault")("https://novelfull.net", {
 	id = 951840,
 	name = "NovelFull (NET)",
-	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/NovelFullNET.png",
+	imageURL = "https://shosetsuorg.gitlab.io/extensions/icons/NovelFullNET.png",
 
 	searchImgModFunc = function(imageURL)
 		return imageURL:gsub("00aa49a68cf30c9157b01d4feff36ff7", "2239c49aee6b961904acf173b7e4602a")

@@ -197,7 +197,7 @@ return {
     id = 1915581930,
     name = "Xiaowaz",
     baseURL = baseURL,
-    imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/Xiaowaz.png",
+    imageURL = "https://shosetsuorg.gitlab.io/extensions/icons/Xiaowaz.png",
 
     listings = {
         Listing("All Series", false, allSeries)

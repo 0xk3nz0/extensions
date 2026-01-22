@@ -175,7 +175,7 @@ return {
 	id = 911,
 	name = "Creative Novels",
 	baseURL = baseURL,
-	imageURL = "https://gitlab.com/shosetsuorg/extensions/-/raw/dev/icons/CreativeNovels.png",
+	imageURL = "https://shosetsuorg.gitlab.io/extensions/icons/CreativeNovels.png",
 	chapterType = ChapterType.HTML,
 	hasSearch = true,
 	isSearchIncrementing = false,
