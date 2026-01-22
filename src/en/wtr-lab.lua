@@ -1,4 +1,4 @@
--- {"id":102555,"ver":"1.0.5","libVer":"1.0.0","author":"Zordic"}
+-- {"id":102555,"ver":"1.0.6","libVer":"1.0.0","author":"Zordic"}
 
 local json = Require("dkjson")
 
@@ -11,12 +11,12 @@ local baseURL = "https://wtr-lab.com/"
 
 ---  Api URL of the ChapterData.
 local apiUrl =   "https://wtr-lab.com/api/reader/get"
+local proxyUrl = "https://wtr-lab-proxy.fly.dev/chapter"
 local Translation_url = "https://translate-pa.googleapis.com/v1/translateHtml"
 local autkey = "AIzaSyATBXajvzQLTDHEQbcpq0Ihe0vWDHmO520"
 
 --- URL of the logo.
 local imageURL = "https://i.imgur.com/ObQtFVW.png"
-
 
 --MediaType for JSON
 local mtype = MediaType("application/json; charset=utf-8")
@@ -107,7 +107,14 @@ local function getPassage(chapterURL)
     local response = Request(POST(apiUrl, headers, body))
     local responseBody = response:body():string()
     local jdata = json.decode(responseBody)
-    local htmlContent = jdata.data.data.body
+    local encrypyedbody = jdata.data.data.body
+    local proxyPayload = {payload = encrypyedbody}
+    local proxyBody = RequestBody(json.encode(proxyPayload), mtype)
+    local proxyHeaders = HeadersBuilder():add("Content-Type", "application/json"):build()
+    local proxyResponse = Request(POST(proxyUrl, proxyHeaders, proxyBody))
+    local responseBody = proxyResponse:body():string()
+    local decrypted = json.decode(responseBody)
+    local htmlContent = decrypted
     local payload2 = {
         {htmlContent, "zh-CN", "en" },
         "wt_lib"
@@ -151,10 +158,10 @@ local function parseNovel(novelURL)
     end
     local script = doc:selectFirst("#__NEXT_DATA__"):html()
     local data = json.decode(script)
-    local serie = data.props.pageProps.serie
+    local serie = data.props.pageProps.serie.serie_data
     local novelInfo = NovelInfo {
-        title = doc:selectFirst("h1.text-uppercase"):text(),
-        imageURL = doc:selectFirst("div.image-wrap img"):attr("src"),
+        title = serie.data.title,
+        imageURL = serie.data.image,
         description = doc:selectFirst(".description"):text(),
         authors = {doc:select("td:matches(^Author$) + td a"):text()},
         status = ({
@@ -163,15 +170,15 @@ local function parseNovel(novelURL)
         })[doc:selectFirst("td:matches(^Status$) + td"):text()],
     }
     if isReleased then
-        local endNum = serie.serie_data.chapter_count
-        local chaplist = baseURL .. 'api/chapters' .. "/" .. serie.serie_data.raw_id.."?start=1&end=" .. endNum
+        local endNum = serie.chapter_count
+        local chaplist = baseURL .. 'api/chapters' .. "/" .. serie.raw_id.."?start=1&end=" .. endNum
         local chapdoc = GETDocument(chaplist)
         local chapterData = json.decode(chapdoc:selectFirst("body"):text())
         local chapters = {}
         for i, ch in ipairs(chapterData.chapters) do
             chapters[#chapters+1] = NovelChapter {
                 title = ch.title,
-                link = "serie-" .. serie.serie_data.raw_id .. "/" .. serie.serie_data.slug .. "/chapter-" .. ch.order .. "?service=web",
+                link = "serie-" .. serie.raw_id .. "/" .. serie.slug .. "/chapter-" .. ch.order,
                 order = i
             }
         end
@@ -228,7 +235,7 @@ local listings = {
             return Novel {
                 title = el:select(".title-wrap a"):text():gsub(el:select(".rawtitle"):text(), ""),
                 link = shrinkURL(el:select("a"):attr("href"), KEY_NOVEL_URL),
-                imageURL = el:select("img"):attr("src")
+                imageURL = baseURL .. el:select("div.image-wrap.zoom img"):attr("src")
             }
         end)
     end),
@@ -240,7 +247,7 @@ local listings = {
             return Novel {
                 title = el:select(".title-wrap a"):text():gsub(el:select(".rawtitle"):text(), ""),
                 link = shrinkURL(el:select("a"):attr("href"), KEY_NOVEL_URL),
-                imageURL = el:select("img"):attr("src")
+                imageURL = baseURL .. el:select("img"):attr("src"),
             }
         end)
     end)
