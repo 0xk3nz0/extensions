@@ -1,4 +1,4 @@
--- {"id":1403038472,"ver":"1.1.1","libVer":"1.0.0","author":"JFronny","dep":["XenForo>=1.0.1"]}
+-- {"id":1403038472,"ver":"1.1.2","libVer":"1.0.0","author":"JFronny","dep":["XenForo>=1.0.1"]}
 
 return Require("XenForo")("https://forums.spacebattles.com/", {
     id = 1403038472,

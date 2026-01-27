@@ -892,9 +892,9 @@
 			"fileName": "SpaceBattles",
 			"imageURL": "https://shosetsuorg.gitlab.io/extensions/icons/SpaceBattles.png",
 			"lang": "en",
-			"ver": "1.1.1",
+			"ver": "1.1.2",
 			"libVer": "1.0.0",
-			"md5": "6ca0b5675de03ae3562754645756f850b48cf0d3759efdcac141efe7a4dddd98",
+			"md5": "65d46daa0f8110e3939661ccc4ff4dd2fea77574ae184dce0e12c6045165c534",
 			"type": "LuaScript"
 		},
 		{
