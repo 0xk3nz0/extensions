@@ -13,3 +13,6 @@ extension-tester.jar
 _doc.lua
 doc.js
 node_modules/
+
+# Errors text file from extension tester
+errors.txt
