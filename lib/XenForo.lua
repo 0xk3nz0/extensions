@@ -1,4 +1,4 @@
--- {"ver":"1.0.10","author":"JFronny","dep":["unhtml>=1.0.0","url>=1.0.0"]}
+-- {"ver":"1.0.11","author":"JFronny","dep":["unhtml>=1.0.0","url>=1.0.0"]}
 
 local HTMLToString = Require("unhtml").HTMLToString
 local qs = Require("url").querystring
@@ -41,6 +41,20 @@ function defaults:expandURL(url)
     return self.baseURL .. "threads/" .. url
 end
 
+---@param document Element
+local function fixSpoilerImages(document)
+    map(document:select(".bbCodeBlock-content"), function(v)
+        map(v:select("img.lazyload:not(noscript *)"), function(a)
+            local siblings = a:nextElementSiblings()
+            if siblings and siblings:size() > 0 then
+                local sibling = siblings:get(0)
+                a:attr("src", sibling:selectFirst("img"):attr("src"))
+                sibling:remove()
+            end
+        end)
+    end)
+end
+
 function defaults:getPassage(url)
     --- Chapter page, extract info from it.
     local doc = GETDocument(self.expandURL(url, KEY_CHAPTER_URL))
@@ -48,6 +62,8 @@ function defaults:getPassage(url)
     local post = doc:selectFirst("#js-" .. id)
     local message = post:selectFirst(".bbWrapper")
     message:select(".bbCodeBlock-expandLink, .bbCodeBlock-shrinkLink"):remove()
+    message:select(".bbCodeSpoiler button"):remove()
+    fixSpoilerImages(message)
 
     return pageOfElem(message, true)
 end
