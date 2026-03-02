@@ -1,4 +1,4 @@
--- {"ver":"1.0.11","author":"JFronny","dep":["unhtml>=1.0.0","url>=1.0.0"]}
+-- {"ver":"1.0.12","author":"JFronny","dep":["unhtml>=1.0.0","url>=1.0.0"]}
 
 local HTMLToString = Require("unhtml").HTMLToString
 local qs = Require("url").querystring
@@ -41,8 +41,9 @@ function defaults:expandURL(url)
     return self.baseURL .. "threads/" .. url
 end
 
+---@param document string
 ---@param document Element
-local function fixSpoilerImages(document)
+local function fixImages(baseURL, document)
     map(document:select(".bbCodeBlock-content"), function(v)
         map(v:select("img.lazyload:not(noscript *)"), function(a)
             local siblings = a:nextElementSiblings()
@@ -52,6 +53,13 @@ local function fixSpoilerImages(document)
                 sibling:remove()
             end
         end)
+    end)
+    map(document:select("img"), function(v)
+        local src = v:attr("src")
+        if src:find("^/") then
+            src = baseURL .. src
+        end
+        v:attr("src", src)
     end)
 end
 
@@ -63,7 +71,7 @@ function defaults:getPassage(url)
     local message = post:selectFirst(".bbWrapper")
     message:select(".bbCodeBlock-expandLink, .bbCodeBlock-shrinkLink"):remove()
     message:select(".bbCodeSpoiler button"):remove()
-    fixSpoilerImages(message)
+    fixImages(self.baseURL, message)
 
     return pageOfElem(message, true)
 end
