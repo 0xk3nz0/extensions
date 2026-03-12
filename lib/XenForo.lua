@@ -1,4 +1,4 @@
--- {"ver":"1.0.12","author":"JFronny","dep":["unhtml>=1.0.0","url>=1.0.0"]}
+-- {"ver":"1.0.13","author":"JFronny","dep":["unhtml>=1.0.0","url>=1.0.0"]}
 
 local HTMLToString = Require("unhtml").HTMLToString
 local qs = Require("url").querystring
@@ -133,7 +133,7 @@ function defaults:parseNovel(novelURL, loadChapters)
         description = description,
         authors = map(username, text),
         status = s,
-        tags = tags
+        genres = tags
     }
 
     if loadChapters then
@@ -266,7 +266,7 @@ function defaults:search(data)
             authors = {
                 author
             },
-            tags = tags
+            genres = tags
         }
     end)
 end
@@ -314,7 +314,7 @@ return function(baseURL, _self)
                     authors = {
                         author
                     },
-                    tags = tags
+                    genres = tags
                 }
             end)
         end)
