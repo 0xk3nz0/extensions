@@ -139,6 +139,13 @@
 			"desc": "Worked on Xiaowaz",
 			"imageURL": "",
 			"website": ""
+		},
+		{
+			"id": -778352505,
+			"name": "wsu808",
+			"desc": "Worked on FilterOptions",
+			"imageURL": "",
+			"website": ""
 		}
 	],
 	"libraries": [
@@ -153,6 +160,12 @@
 			"ver": "1.0.1",
 			"url": null,
 			"hash": "eb398cff152cf1ff1a7ca7ad415f55bf55aca0acefafb5363982e083de18a67d"
+		},
+		{
+			"name": "FilterOptions",
+			"ver": "1.0.0",
+			"url": null,
+			"hash": "57c00d5aebb5a86ab17f4ca74e832ea35b3722de302c3e41fb251e38a8ea8e9c"
 		},
 		{
 			"name": "Madara",
