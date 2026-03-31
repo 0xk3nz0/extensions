@@ -1,4 +1,4 @@
--- {"id":102555,"ver":"1.0.6","libVer":"1.0.0","author":"Zordic"}
+-- {"id":102555,"ver":"1.0.7","libVer":"1.0.0","author":"Zordic"}
 
 local json = Require("dkjson")
 
@@ -159,15 +159,26 @@ local function parseNovel(novelURL)
     local script = doc:selectFirst("#__NEXT_DATA__"):html()
     local data = json.decode(script)
     local serie = data.props.pageProps.serie.serie_data
+    local authorElements = doc:select(".serie-info-grid .sig-row:has(.sig-label:matchesOwn(^Author$)) .sig-value a.sig-author-alt")
+    local authors = authorElements and map(authorElements, text) or {}
+    if authors == nil or #authors == 0 then
+        authors = {"Unknown"}
+    end
+    local statusText = ""
+    local statusElement = doc:selectFirst(".serie-info-grid .sig-row:has(.sig-label:matchesOwn(^Status$)) .sig-value")
+    if statusElement ~= nil then
+        statusText = statusElement:text()
+    end
+    local status = ({
+        Ongoing = NovelStatus.PUBLISHING,
+        Completed = NovelStatus.COMPLETED,
+    })[statusText] or NovelStatus.UNKNOWN
     local novelInfo = NovelInfo {
         title = serie.data.title,
         imageURL = serie.data.image,
         description = doc:selectFirst(".description"):text(),
-        authors = {doc:select("td:matches(^Author$) + td a"):text()},
-        status = ({
-            Ongoing = NovelStatus.PUBLISHING,
-            Completed = NovelStatus.COMPLETED,
-        })[doc:selectFirst("td:matches(^Status$) + td"):text()],
+        authors = authors,
+        status = status,
     }
     if isReleased then
         local endNum = serie.chapter_count
