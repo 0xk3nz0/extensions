@@ -181,9 +181,9 @@
 		},
 		{
 			"name": "XenForo",
-			"ver": "1.0.13",
+			"ver": "1.0.14",
 			"url": null,
-			"hash": "6dcf1eea9c765fdec65b6cdc505365df2e6f7ea65461dc443f7f7791291234e9"
+			"hash": "dc7cb89d601af59726949d611b199ca5ac5af6d4ee1aadf35c9e31e1038c3f12"
 		},
 		{
 			"name": "dkjson",

@@ -1,4 +1,4 @@
--- {"ver":"1.0.13","author":"JFronny","dep":["unhtml>=1.0.0","url>=1.0.0"]}
+-- {"ver":"1.0.14","author":"JFronny","dep":["unhtml>=1.0.0","url>=1.0.0"]}
 
 local HTMLToString = Require("unhtml").HTMLToString
 local qs = Require("url").querystring
@@ -225,8 +225,8 @@ function defaults:search(data)
     end
 
     -- Example search URLs (from SpaceBattles):
-    -- Creative Writing: https://forums.spacebattles.com/search/1/?t=post&c[child_nodes]=1&c[nodes][0]=18&c[threadmark_categories][0]=1&c[threadmark_only]=1&c[title_only]=1&o=relevance&g=1&q=Josh
-    -- Quests:           https://forums.spacebattles.com/search/1/?t=post&c[child_nodes]=1&c[nodes][0]=240&c[threadmark_categories][0]=1&c[threadmark_only]=1&c[title_only]=1&o=relevance&g=1&q=Josh
+    -- Creative Writing: https://forums.spacebattles.com/search/1/?t=post&c[child_nodes]=1&c[nodes][0]=18&c[threadmark_categories][0]=1&c[title_only]=1&o=relevance&g=1&q=Josh
+    -- Quests:           https://forums.spacebattles.com/search/1/?t=post&c[child_nodes]=1&c[nodes][0]=240&c[threadmark_categories][0]=1&c[title_only]=1&o=relevance&g=1&q=Josh
     local page = GETDocument(self.baseURL .. "search/" .. searchID .. "/?" .. qs({
         page = data[PAGE],
         q = data[QUERY],
@@ -234,7 +234,6 @@ function defaults:search(data)
         ["c[child_nodes]"] = 1,
         ["c[nodes][0]"] = forum,
         ["c[threadmark_categories][0]"] = 1,
-        ["c[threadmark_only]"] = 1,
         ["c[title_only]"] = 1,
         o = order,
         g = 1
